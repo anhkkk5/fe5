@@ -10,7 +10,7 @@ import CompaniesPage from "../pages/Companies/index.jsx";
 import CompanyDetail from "../pages/CompanyDetail/index.jsx";
 import CandidateDetail from "../pages/CandidateDetail/index.jsx";
 import CVPage from "../pages/CV/index.jsx";
-import Search from "../pages/Search/index.jsx";
+import Search from "../pages/search/index.jsx";
 import Post from "../pages/Post/index.jsx";
 import CreateJob from "../pages/CreateJob/index.jsx";
 import SavedJobs from "../pages/SavedJobs/index.jsx";
