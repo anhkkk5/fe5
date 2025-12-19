@@ -1,0 +1,21 @@
+.company-ads {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.company-ads h1 {
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+.company-ads__loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.company-ads__slot-card,
+.company-ads__bookings-card {
+  margin-bottom: 24px;
+}

@@ -1,0 +1,107 @@
+/* Wrapper and header */
+.fj-wrapper {
+  padding: 32px 0 8px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.fj-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.fj-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.fj-view-more {
+  color: #c62828 !important;
+  font-weight: 600;
+}
+
+/* Card */
+.fj-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fj-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+}
+
+.fj-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.fj-job-title {
+  margin: 0 !important;
+}
+
+.fj-bookmark {
+  color: #bfbfbf;
+  font-size: 18px;
+}
+
+.fj-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.fj-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.fj-badge.part {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.fj-badge.intern {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.fj-salary {
+  color: #8c8c8c;
+}
+
+.fj-company {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.fj-avatar {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.fj-company-name {
+  font-weight: 600;
+}
+
+.fj-location {
+  color: #8c8c8c;
+}

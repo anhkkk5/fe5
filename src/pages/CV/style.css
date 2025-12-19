@@ -1,0 +1,529 @@
+/* ========== Layout mới kiểu CV cũ (không sidebar) ========== */
+
+.cv-wrapper {
+  max-width: 900px;
+  margin: 24px auto 40px;
+  padding: 0 16px 32px;
+}
+
+.cv-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cv-sheet {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 24px 32px 32px;
+}
+
+.cv-header {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.cv-avatar {
+  flex-shrink: 0;
+}
+
+.cv-avatar img {
+  width: 140px;
+  height: 140px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.cv-summary {
+  flex: 1;
+}
+
+.cv-name {
+  margin-bottom: 4px;
+}
+
+.cv-position {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.cv-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 24px;
+}
+
+.cv-info-row {
+  font-size: 13px;
+}
+
+.cv-info-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.cv-info-value {
+  color: #333;
+}
+
+.cv-section {
+  margin-top: 20px;
+}
+
+.cv-section-title {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-top: 1px solid #bbb;
+  padding-top: 8px;
+  margin-bottom: 8px;
+}
+
+.cv-entry {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  align-items: flex-start;
+}
+
+.cv-entry-time {
+  width: 130px;
+  flex-shrink: 0;
+  color: #555;
+}
+
+.cv-entry-body {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.cv-entry-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cv-entry-actions .ant-btn-link {
+  padding: 0;
+  height: auto;
+  font-size: 13px;
+}
+
+/* Chế độ xuất PDF: ẩn toàn bộ nút thao tác trong CV */
+.cv-sheet.pdf-export .cv-entry-actions {
+  display: none !important;
+}
+
+.cv-entry-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111;
+}
+
+.cv-field-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.cv-entry-subtitle {
+  font-size: 13px;
+  color: #444;
+  margin: 2px 0 6px 0;
+}
+
+.cv-entry-link {
+  font-size: 13px;
+  color: #1677ff;
+  margin-bottom: 4px;
+}
+
+.cv-paragraph {
+  margin-bottom: 0;
+}
+
+.cv-bullets {
+  padding-left: 18px;
+  margin: 4px 0 0;
+}
+
+/* ========== Các style cũ (sidebar) vẫn giữ để không ảnh hưởng trang khác ========== */
+
+.cv-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.cv-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.breadcrumb {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* Sidebar */
+.sidebar-card {
+  margin-bottom: 20px;
+}
+
+.sidebar-card .ant-card-body {
+  padding: 24px;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.action-item:hover {
+  color: #c41e3a;
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+/* Profile Card */
+.profile-card {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  gap: 20px;
+  position: relative;
+}
+
+.profile-avatar {
+  text-align: center;
+}
+
+.profile-avatar img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.company-label {
+  display: block;
+  background-color: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h3 {
+  margin: 0 0 4px 0;
+  color: #c41e3a;
+}
+
+.profile-position {
+  color: #666;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.edit-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 18px;
+  color: #c41e3a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+.edit-icon:hover {
+  color: #a01830;
+  transform: scale(1.1);
+}
+
+/* Profile header specific */
+.profile-header {
+  position: relative;
+}
+
+.profile-header .edit-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* Section Cards */
+.section-card {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Draggable wrappers */
+.draggable-section {
+  cursor: grab;
+}
+.draggable-section:active {
+  cursor: grabbing;
+}
+.draggable-section.dragging {
+  outline: 2px dashed #c41e3a;
+  border-radius: 8px;
+}
+
+/* Print only the CV area on the right */
+@media print {
+  body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif !important;
+  }
+  /* Hide everything by default */
+  body * {
+    visibility: hidden !important;
+    box-shadow: none !important;
+  }
+  /* Only show CV printable area */
+  .cv-print-area,
+  .cv-print-area * {
+    visibility: visible !important;
+  }
+  .cv-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+  /* Remove UI controls when printing */
+  .section-toolbar,
+  .action-item,
+  .breadcrumb,
+  .ant-btn,
+  .ant-card-extra {
+    display: none !important;
+  }
+  /* Hide inline action icons in headers */
+  .cv-print-area .edit-icon,
+  .cv-print-area .add-icon,
+  .cv-print-area .delete-icon,
+  .cv-print-area .anticon-plus,
+  .cv-print-area .anticon-edit,
+  .cv-print-area .anticon-delete {
+    display: none !important;
+  }
+  .ant-card,
+  .section-card,
+  .profile-card {
+    box-shadow: none !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  /* Tighten paddings for print */
+  .cv-print-area .ant-card-body {
+    padding: 8px 0 !important;
+  }
+  .cv-print-area .ant-typography {
+    color: #111 !important;
+  }
+  .cv-print-area h1,
+  .cv-print-area h2,
+  .cv-print-area h3,
+  .cv-print-area h4 {
+    color: #111 !important;
+    margin: 8px 0 6px 0 !important;
+  }
+  .cv-print-area h1 {
+    font-size: 22px !important;
+  }
+  .cv-print-area h2 {
+    font-size: 18px !important;
+  }
+  .cv-print-area h3 {
+    font-size: 16px !important;
+  }
+  .cv-print-area h4 {
+    font-size: 14px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+  }
+  .cv-print-area p {
+    margin: 4px 0 !important;
+    line-height: 1.35;
+  }
+
+  /* Avoid breaking a section across pages */
+  .cv-print-area .draggable-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  .cv-print-area #section-profile {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Remove backgrounds of tags or badges for clarity */
+  .cv-print-area .ant-tag {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+    border-color: #e5e5e5 !important;
+  }
+
+  /* Icons color neutral */
+  .cv-print-area .anticon {
+    color: #444 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+  min-height: 32px;
+}
+
+.section-header h4 {
+  margin: 0;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+}
+
+/* Common styles for all edit icons */
+.section-header .edit-icon,
+.action-icons .edit-icon {
+  font-size: 18px;
+  color: #c41e3a;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.section-header .edit-icon:hover,
+.action-icons .edit-icon:hover {
+  color: #a01830;
+  transform: scale(1.1);
+}
+
+/* Action icons container for edit and delete icons */
+.action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.action-icons .delete-icon {
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.action-icons .edit-icon {
+  color: #c41e3a;
+}
+
+.action-icons .edit-icon:hover {
+  color: #a01830;
+  transform: scale(1.1);
+}
+
+.action-icons .delete-icon {
+  color: #ff4d4f;
+}
+
+.action-icons .delete-icon:hover {
+  color: #d9363e;
+  transform: scale(1.1);
+}
+
+/* Legacy support for old class names */
+.add-icon {
+  font-size: 18px;
+  color: #c41e3a;
+  cursor: pointer;
+}
+
+.add-icon:hover {
+  color: #a01830;
+}
+
+.delete-icon {
+  font-size: 18px;
+  color: #ff4d4f;
+  cursor: pointer;
+}
+
+.delete-icon:hover {
+  color: #d9363e;
+}
+
+.section-description {
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+  }
+
+  .profile-avatar {
+    text-align: left;
+  }
+}
+

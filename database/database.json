@@ -1,0 +1,755 @@
+{
+  "Admins": [
+    {
+      "id": "ADMIN001",
+      "email": "admin@gmail.com",
+      "password": "123456",
+      "fullName": "Admin",
+      "role": "admin",
+      "token": "adminToken123456789",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-10-30"
+    }
+  ],
+  "Candidates": [
+    {
+      "id": "C001",
+      "fullName": "Nguyễn Văn A",
+      "isOpen": 1,
+      "dob": "1995-05-15",
+      "address": "Hà Nội, Việt Nam",
+      "email": "nguyenvana@example.com",
+      "phone": "0123456789",
+      "password": "hashed_password_1",
+      "gender": 1,
+      "link_fb": "https://facebook.com/nguyenvana",
+      "link_linkedin": "https://linkedin.com/in/nguyenvana",
+      "link_git": "https://github.com/nguyenvana",
+      "created_at": "2025-01-10",
+      "updated_at": "2025-10-06",
+      "introduction": "giỏi\n",
+      "status": "active"
+    },
+    {
+      "id": "C002",
+      "fullName": "Trần Thị B",
+      "isOpen": 0,
+      "dob": "1998-08-20",
+      "address": "TP. Hồ Chí Minh, Việt Nam",
+      "email": "tranthib@example.com",
+      "phone": "0987654321",
+      "password": "hashed_password_2",
+      "gender": 0,
+      "link_fb": "https://facebook.com/tranthib",
+      "link_linkedin": "https://linkedin.com/in/tranthib",
+      "link_git": "https://github.com/tranthib",
+      "created_at": "2025-02-15",
+      "updated_at": "2025-09-20",
+      "status": "active"
+    },
+    {
+      "id": "C003",
+      "fullName": "Lê Văn C",
+      "isOpen": 1,
+      "dob": "1992-03-10",
+      "address": "Đà Nẵng, Việt Nam",
+      "email": "levanc@example.com",
+      "phone": "0369852741",
+      "password": "hashed_password_3",
+      "gender": 1,
+      "link_fb": "https://facebook.com/levanc",
+      "link_linkedin": "https://linkedin.com/in/levanc",
+      "link_git": "https://github.com/levanc",
+      "created_at": "2025-03-20",
+      "updated_at": "2025-10-15",
+      "status": "active"
+    }
+  ],
+  "Education_Candidate": [
+    {
+      "id": "E001",
+      "candidate_id": "C001",
+      "name_education": "Đại học Bách Khoa Hà Nội",
+      "major": "Công nghệ Thông tin",
+      "started_at": "2018-09-01",
+      "end_at": "2022-06-30",
+      "info": "GPA: 3.5/4.0",
+      "created_at": "2025-01-10",
+      "updated_at": "2025-10-06"
+    },
+    {
+      "id": "E002",
+      "candidate_id": "C002",
+      "name_education": "Đại học Kinh tế TP.HCM",
+      "major": "Marketing",
+      "started_at": "2016-09-01",
+      "end_at": "2020-06-30",
+      "info": "GPA: 3.7/4.0",
+      "created_at": "2025-02-15",
+      "updated_at": "2025-09-20"
+    },
+    {
+      "id": "E003",
+      "candidate_id": "C003",
+      "name_education": "Đại học Bách Khoa Đà Nẵng",
+      "major": "Kỹ thuật Phần mềm",
+      "started_at": "2014-09-01",
+      "end_at": "2018-06-30",
+      "info": "GPA: 3.8/4.0",
+      "created_at": "2025-03-20",
+      "updated_at": "2025-10-15"
+    },
+    {
+      "id": "e5e5",
+      "candidate_id": "cf3a",
+      "name_education": "cmc",
+      "major": "cs",
+      "started_at": "2025-09-29",
+      "end_at": "2025-10-24",
+      "info": "hay",
+      "updated_at": "2025-10-16",
+      "created_at": "2025-10-16"
+    }
+  ],
+  "Experience_Candidate": [
+    {
+      "id": "EX001",
+      "candidate_id": "C001",
+      "position": "Junior Developer",
+      "company": "COMP001",
+      "started_at": "2022-07-01",
+      "end_at": "2024-12-31",
+      "info": "Phát triển ứng dụng web với React và Node.js",
+      "created_at": "2025-01-10",
+      "updated_at": "2025-10-06"
+    },
+    {
+      "id": "EX002",
+      "candidate_id": "C002",
+      "position": "Marketing Specialist",
+      "company": "COMP002",
+      "started_at": "2023-07-01",
+      "end_at": null,
+      "info": "Quản lý chiến dịch quảng cáo trên Google Ads",
+      "created_at": "2025-02-15",
+      "updated_at": "2025-09-20"
+    },
+    {
+      "id": "EX003",
+      "candidate_id": "C001",
+      "position": "Frontend Developer",
+      "company": "COMP001",
+      "started_at": "2020-01-01",
+      "end_at": "2022-06-30",
+      "info": "Phát triển giao diện người dùng với React và Vue.js",
+      "created_at": "2025-01-10",
+      "updated_at": "2025-10-06"
+    },
+    {
+      "id": "EX004",
+      "candidate_id": "C003",
+      "position": "Senior Developer",
+      "company": "COMP001",
+      "started_at": "2018-07-01",
+      "end_at": null,
+      "info": "Thiết kế và phát triển hệ thống backend với Java và Spring Boot",
+      "created_at": "2025-03-20",
+      "updated_at": "2025-10-15"
+    },
+    {
+      "id": "c391",
+      "candidate_id": "cf3a",
+      "position": "Full-Stack Developer",
+      "company": "rikei",
+      "started_at": "2025-09-11",
+      "end_at": "2025-10-18",
+      "info": "giao diện , logic , test\n",
+      "created_at": "2025-10-16",
+      "updated_at": "2025-10-16"
+    }
+  ],
+  "Projects_Candidate": [
+    {
+      "id": "8e02",
+      "candidate_id": "cf3a",
+      "project_name": "cv_managent",
+      "demo_link": "http://localhost:5173/cv",
+      "started_at": "2025-10-01",
+      "end_at": "2025-10-18",
+      "description": "sadsadsa",
+      "created_at": "2025-10-16",
+      "updated_at": "2025-10-16"
+    }
+  ],
+  "Certificates_Candidate": [
+    {
+      "id": "058d",
+      "candidate_id": "cf3a",
+      "certificate_name": "topic",
+      "organization": "tiếng a",
+      "started_at": "2023-10-10",
+      "end_at": "2025-10-16",
+      "description": "",
+      "created_at": "2025-10-16",
+      "updated_at": "2025-10-16"
+    }
+  ],
+  "activities": [],
+  "awards": [],
+  "skills": [],
+  "references": [],
+  "hobbies": [],
+  "Companies": [
+    {
+      "id": "COMP001",
+      "fullName": "FPT Software",
+      "companyName": "FPT Software",
+      "email": "fpt@gmail.com",
+      "password": "123456",
+      "token": "FPTtoken123456789",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfbmhQMd8GvT_zux-0GFUNZHXXzij1quekTg&s",
+      "description": "Công ty công nghệ hàng đầu Việt Nam.",
+      "website": "https://fpt.com/vi",
+      "address": "Hà Nội, Việt Nam",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-11-13",
+      "status": "active",
+      "name": "FPT Software"
+    },
+    {
+      "id": "COMP002",
+      "fullName": "VNG Corporation",
+      "logo": "data:image/png;base64,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",
+      "description": "Tập đoàn công nghệ lớn nhất Việt Nam",
+      "website": "https://vng.com.vn",
+      "address": "TP. Hồ Chí Minh, Việt Nam",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-11-13",
+      "email": "vng@gmail.com",
+      "password": "123456",
+      "status": "active",
+      "companyName": "VNG",
+      "name": "VNG"
+    },
+    {
+      "id": "COMP003",
+      "fullName": "Tiki Corporation",
+      "logo": "data:image/png;base64,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",
+      "description": "Sàn thương mại điện tử hàng đầu Việt Nam",
+      "website": "https://tiki.vn",
+      "address": "TP. Hồ Chí Minh, Việt Nam",
+      "created_at": "2025-02-01",
+      "updated_at": "2025-11-13",
+      "email": "tiki@gmail.com",
+      "password": "123456",
+      "status": "active",
+      "companyName": "TIKI",
+      "name": "TIKI"
+    }
+  ],
+  "Locations": [
+    {
+      "id": "LOC001",
+      "name": "Hà Nội",
+      "city": "Hà Nội",
+      "country": "Việt Nam",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    },
+    {
+      "id": "LOC002",
+      "name": "TP. Hồ Chí Minh",
+      "city": "TP. Hồ Chí Minh",
+      "country": "Việt Nam",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    },
+    {
+      "id": "LOC003",
+      "name": "Đà Nẵng",
+      "city": "Đà Nẵng",
+      "country": "Việt Nam",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    }
+  ],
+  "Jobs": [
+    {
+      "id": "J001",
+      "title": "Fullstack Developer",
+      "company_id": "COMP001",
+      "description": "Tìm kiếm lập trình viên Fullstack có kinh nghiệm để phát triển các ứng dụng web hiện đại. Ứng viên sẽ tham gia vào việc thiết kế, phát triển và triển khai các giải pháp công nghệ tiên tiến.",
+      "requirements": [
+        "Tối thiểu 2 năm kinh nghiệm phát triển web",
+        "Thành thạo JavaScript, React.js, Node.js",
+        "Kinh nghiệm làm việc với database (MySQL, MongoDB)",
+        "Hiểu biết về RESTful API và GraphQL",
+        "Kinh nghiệm với Git và các công cụ quản lý phiên bản",
+        "Khả năng làm việc nhóm và giao tiếp tốt"
+      ],
+      "desirable": [
+        "Kinh nghiệm với Docker và Kubernetes",
+        "Kiến thức về cloud platforms (AWS, Azure)",
+        "Kinh nghiệm với testing frameworks (Jest, Mocha)",
+        "Hiểu biết về CI/CD pipelines"
+      ],
+      "benefits": [
+        "Lương cạnh tranh từ 15-25 triệu VND/tháng",
+        "Bảo hiểm sức khỏe toàn diện",
+        "Nghỉ phép có lương 12 ngày/năm",
+        "Môi trường làm việc năng động, sáng tạo",
+        "Cơ hội thăng tiến và phát triển nghề nghiệp",
+        "Tham gia các khóa đào tạo kỹ năng chuyên môn",
+        "Phụ cấp ăn trưa và gửi xe",
+        "Hoạt động team building định kỳ"
+      ],
+      "salary": "15-25 triệu VND",
+      "location_id": "LOC001",
+      "type": "FULL-TIME",
+      "jobLevel": "Junior",
+      "experience": "2-3 năm",
+      "education": "Đại học",
+      "expire_at": "2025-11-30",
+      "created_at": "2025-09-01",
+      "updated_at": "2025-10-06",
+      "status": "active"
+    },
+    {
+      "id": "J002",
+      "title": "Marketing Manager",
+      "company_id": "COMP002",
+      "description": "Tìm kiếm Marketing Manager có kinh nghiệm để quản lý và phát triển các chiến dịch marketing hiệu quả. Ứng viên sẽ chịu trách nhiệm lập kế hoạch, thực hiện và đánh giá các hoạt động marketing của công ty.",
+      "requirements": [
+        "Tối thiểu 3 năm kinh nghiệm trong lĩnh vực Marketing",
+        "Thành thạo Digital Marketing và Social Media Marketing",
+        "Kinh nghiệm quản lý ngân sách marketing",
+        "Kỹ năng phân tích dữ liệu và báo cáo",
+        "Hiểu biết về SEO/SEM và Google Analytics",
+        "Khả năng lãnh đạo và quản lý nhóm"
+      ],
+      "desirable": [
+        "Kinh nghiệm với các công cụ marketing automation",
+        "Chứng chỉ Google Ads, Facebook Blueprint",
+        "Kinh nghiệm trong ngành game hoặc fintech",
+        "Hiểu biết về content marketing và branding"
+      ],
+      "benefits": [
+        "Lương cạnh tranh từ 20-30 triệu VND/tháng",
+        "Thưởng KPI hàng tháng",
+        "Bảo hiểm sức khỏe và nha khoa",
+        "Nghỉ phép có lương 15 ngày/năm",
+        "Môi trường làm việc trẻ trung, năng động",
+        "Cơ hội học hỏi và phát triển kỹ năng",
+        "Phụ cấp ăn trưa, gym và giải trí",
+        "Du lịch công ty hàng năm"
+      ],
+      "salary": "20-30 triệu VND",
+      "location_id": "LOC002",
+      "type": "FULL-TIME",
+      "jobLevel": "Senior",
+      "experience": "3-5 năm",
+      "education": "Đại học",
+      "expire_at": "2025-12-15",
+      "created_at": "2025-09-10",
+      "updated_at": "2025-09-20",
+      "status": "active"
+    },
+    {
+      "id": "J003",
+      "title": "UX/UI Designer",
+      "company_id": "COMP003",
+      "description": "Tìm kiếm UX/UI Designer sáng tạo và có kinh nghiệm để thiết kế giao diện người dùng đẹp mắt và trải nghiệm người dùng tối ưu cho các sản phẩm thương mại điện tử.",
+      "requirements": [
+        "Tối thiểu 2 năm kinh nghiệm thiết kế UX/UI",
+        "Thành thạo Figma, Sketch, Adobe Creative Suite",
+        "Hiểu biết về nguyên tắc thiết kế và UX research",
+        "Kinh nghiệm thiết kế responsive và mobile-first",
+        "Khả năng tạo wireframes, prototypes",
+        "Portfolio thể hiện kinh nghiệm thiết kế e-commerce"
+      ],
+      "desirable": [
+        "Kinh nghiệm với HTML, CSS, JavaScript cơ bản",
+        "Hiểu biết về A/B testing và data-driven design",
+        "Kinh nghiệm làm việc với developers",
+        "Chứng chỉ UX/UI từ các tổ chức uy tín"
+      ],
+      "benefits": [
+        "Lương cạnh tranh từ 12-20 triệu VND/tháng",
+        "Bảo hiểm sức khỏe toàn diện",
+        "Nghỉ phép có lương 12 ngày/năm",
+        "Môi trường sáng tạo, khuyến khích ý tưởng mới",
+        "Đào tạo kỹ năng thiết kế và công nghệ mới",
+        "Phụ cấp mua sắm thiết bị thiết kế",
+        "Tham gia các sự kiện design community",
+        "Cơ hội làm việc với các dự án lớn"
+      ],
+      "salary": "12-20 triệu VND",
+      "location_id": "LOC002",
+      "type": "FULL-TIME",
+      "jobLevel": "Junior",
+      "experience": "2-3 năm",
+      "education": "Đại học",
+      "expire_at": "2025-12-31",
+      "created_at": "2025-10-01",
+      "updated_at": "2025-10-15",
+      "status": "active"
+    },
+    {
+      "id": "J004",
+      "title": "DevOps Engineer",
+      "company_id": "COMP001",
+      "description": "Tìm kiếm DevOps Engineer có kinh nghiệm để quản lý và tự động hóa quy trình phát triển phần mềm. Ứng viên sẽ chịu trách nhiệm xây dựng và duy trì infrastructure, CI/CD pipelines.",
+      "requirements": [
+        "Tối thiểu 3 năm kinh nghiệm DevOps",
+        "Thành thạo Docker, Kubernetes, Jenkins",
+        "Kinh nghiệm với cloud platforms (AWS, Azure, GCP)",
+        "Hiểu biết về Infrastructure as Code (Terraform)",
+        "Kinh nghiệm monitoring và logging (Prometheus, ELK)",
+        "Kỹ năng scripting (Bash, Python)"
+      ],
+      "desirable": [
+        "Chứng chỉ AWS/Azure/GCP",
+        "Kinh nghiệm với microservices architecture",
+        "Hiểu biết về security best practices",
+        "Kinh nghiệm với GitOps và ArgoCD"
+      ],
+      "benefits": [
+        "Lương cạnh tranh từ 25-35 triệu VND/tháng",
+        "Bảo hiểm sức khỏe và gia đình",
+        "Nghỉ phép có lương 15 ngày/năm",
+        "Môi trường làm việc hiện đại, công nghệ tiên tiến",
+        "Cơ hội học hỏi công nghệ mới nhất",
+        "Phụ cấp học tập và chứng chỉ",
+        "Làm việc remote linh hoạt",
+        "Thưởng dự án và hiệu suất"
+      ],
+      "salary": "25-35 triệu VND",
+      "location_id": "LOC001",
+      "type": "FULL-TIME",
+      "jobLevel": "Senior",
+      "experience": "3-5 năm",
+      "education": "Đại học",
+      "expire_at": "2026-01-15",
+      "created_at": "2025-10-10",
+      "updated_at": "2025-10-20",
+      "status": "active"
+    }
+  ],
+  "city": [
+    {
+      "id": "1",
+      "code": "01",
+      "name": "Hà Nội"
+    },
+    {
+      "id": "2",
+      "code": "02",
+      "name": "Hà Giang"
+    },
+    {
+      "id": "3",
+      "code": "04",
+      "name": "Cao Bằng"
+    },
+    {
+      "id": "4",
+      "code": "06",
+      "name": "Bắc Kạn"
+    },
+    {
+      "id": "5",
+      "code": "08",
+      "name": "Tuyên Quang"
+    },
+    {
+      "id": "6",
+      "code": "10",
+      "name": "Lào Cai"
+    },
+    {
+      "id": "7",
+      "code": "11",
+      "name": "Điện Biên"
+    },
+    {
+      "id": "8",
+      "code": "12",
+      "name": "Lai Châu"
+    },
+    {
+      "id": "9",
+      "code": "14",
+      "name": "Sơn La"
+    },
+    {
+      "id": "10",
+      "code": "15",
+      "name": "Yên Bái"
+    },
+    {
+      "id": "11",
+      "code": "17",
+      "name": "Hoà Bình"
+    },
+    {
+      "id": "12",
+      "code": "19",
+      "name": "Thái Nguyên"
+    },
+    {
+      "id": "13",
+      "code": "20",
+      "name": "Lạng Sơn"
+    },
+    {
+      "id": "14",
+      "code": "22",
+      "name": "Quảng Ninh"
+    },
+    {
+      "id": "15",
+      "code": "24",
+      "name": "Bắc Giang"
+    },
+    {
+      "id": "16",
+      "code": "25",
+      "name": "Phú Thọ"
+    },
+    {
+      "id": "17",
+      "code": "26",
+      "name": "Vĩnh Phúc"
+    },
+    {
+      "id": "18",
+      "code": "27",
+      "name": "Bắc Ninh"
+    },
+    {
+      "id": "19",
+      "code": "30",
+      "name": "Hải Dương"
+    },
+    {
+      "id": "20",
+      "code": "31",
+      "name": "Hải Phòng"
+    },
+    {
+      "id": "21",
+      "code": "33",
+      "name": "Hưng Yên"
+    },
+    {
+      "id": "22",
+      "code": "34",
+      "name": "Thái Bình"
+    },
+    {
+      "id": "23",
+      "code": "35",
+      "name": "Hà Nam"
+    },
+    {
+      "id": "24",
+      "code": "36",
+      "name": "Nam Định"
+    },
+    {
+      "id": "25",
+      "code": "37",
+      "name": "Ninh Bình"
+    },
+    {
+      "id": "26",
+      "code": "38",
+      "name": "Thanh Hóa"
+    },
+    {
+      "id": "27",
+      "code": "40",
+      "name": "Nghệ An"
+    },
+    {
+      "id": "28",
+      "code": "42",
+      "name": "Hà Tĩnh"
+    },
+    {
+      "id": "29",
+      "code": "44",
+      "name": "Quảng Bình"
+    },
+    {
+      "id": "30",
+      "code": "45",
+      "name": "Quảng Trị"
+    },
+    {
+      "id": "31",
+      "code": "46",
+      "name": "Thừa Thiên Huế"
+    },
+    {
+      "id": "32",
+      "code": "48",
+      "name": "Đà Nẵng"
+    },
+    {
+      "id": "33",
+      "code": "49",
+      "name": "Quảng Nam"
+    },
+    {
+      "id": "34",
+      "code": "51",
+      "name": "Quảng Ngãi"
+    },
+    {
+      "id": "35",
+      "code": "52",
+      "name": "Bình Định"
+    },
+    {
+      "id": "36",
+      "code": "54",
+      "name": "Phú Yên"
+    },
+    {
+      "id": "37",
+      "code": "56",
+      "name": "Khánh Hòa"
+    },
+    {
+      "id": "38",
+      "code": "58",
+      "name": "Ninh Thuận"
+    },
+    {
+      "id": "39",
+      "code": "60",
+      "name": "Bình Thuận"
+    },
+    {
+      "id": "40",
+      "code": "62",
+      "name": "Kon Tum"
+    },
+    {
+      "id": "41",
+      "code": "64",
+      "name": "Gia Lai"
+    },
+    {
+      "id": "42",
+      "code": "66",
+      "name": "Đắk Lắk"
+    },
+    {
+      "id": "43",
+      "code": "67",
+      "name": "Đắk Nông"
+    },
+    {
+      "id": "44",
+      "code": "68",
+      "name": "Lâm Đồng"
+    },
+    {
+      "id": "45",
+      "code": "70",
+      "name": "Bình Phước"
+    },
+    {
+      "id": "46",
+      "code": "72",
+      "name": "Tây Ninh"
+    },
+    {
+      "id": "47",
+      "code": "74",
+      "name": "Bình Dương"
+    },
+    {
+      "id": "48",
+      "code": "75",
+      "name": "Đồng Nai"
+    },
+    {
+      "id": "49",
+      "code": "77",
+      "name": "Bà Rịa - Vũng Tàu"
+    },
+    {
+      "id": "50",
+      "code": "79",
+      "name": "Hồ Chí Minh"
+    },
+    {
+      "id": "51",
+      "code": "80",
+      "name": "Long An"
+    },
+    {
+      "id": "52",
+      "code": "82",
+      "name": "Tiền Giang"
+    },
+    {
+      "id": "53",
+      "code": "83",
+      "name": "Bến Tre"
+    },
+    {
+      "id": "54",
+      "code": "84",
+      "name": "Trà Vinh"
+    },
+    {
+      "id": "55",
+      "code": "86",
+      "name": "Vĩnh Long"
+    },
+    {
+      "id": "56",
+      "code": "87",
+      "name": "Đồng Tháp"
+    },
+    {
+      "id": "57",
+      "code": "89",
+      "name": "An Giang"
+    },
+    {
+      "id": "58",
+      "code": "91",
+      "name": "Kiên Giang"
+    },
+    {
+      "id": "59",
+      "code": "92",
+      "name": "Cần Thơ"
+    },
+    {
+      "id": "60",
+      "code": "93",
+      "name": "Hậu Giang"
+    },
+    {
+      "id": "61",
+      "code": "94",
+      "name": "Sóc Trăng"
+    },
+    {
+      "id": "62",
+      "code": "95",
+      "name": "Bạc Liêu"
+    },
+    {
+      "id": "63",
+      "code": "96",
+      "name": "Cà Mau"
+    }
+  ]
+}

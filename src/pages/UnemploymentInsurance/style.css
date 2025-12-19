@@ -1,0 +1,159 @@
+.ui-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 32px 16px;
+}
+
+.ui-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ui-section {
+  margin-top: 20px;
+}
+
+.ui-section.note {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  padding: 12px;
+  border-radius: 8px;
+  color: #000000 !important;
+}
+
+.ui-section.note * {
+  color: #000000 !important;
+}
+
+.ui-section.note .ant-typography {
+  color: #000000 !important;
+}
+
+.ui-section.note .ant-typography * {
+  color: #000000 !important;
+}
+
+.ui-section.note .anticon {
+  color: #52c41a !important;
+}
+
+.even-row {
+  background: #fafafa;
+  color: #000000;
+}
+
+.even-row .ant-table-cell {
+  color: #000000 !important;
+}
+
+.odd-row {
+  background: #fff;
+  color: #000000;
+}
+
+.odd-row .ant-table-cell {
+  color: #000000 !important;
+}
+
+.ui-page .ant-card {
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #000000;
+}
+
+.ui-page .ant-card-head-title {
+  font-weight: 600;
+  color: #000000;
+}
+
+.ui-page .ant-card-body {
+  color: #000000;
+}
+
+.ui-page .ant-input-number {
+  width: 100%;
+}
+
+.ui-page .ant-typography {
+  color: #000000 !important;
+}
+
+.ui-page .ant-typography strong {
+  color: #000000 !important;
+}
+
+.ui-page .ant-table {
+  color: #000000 !important;
+}
+
+.ui-page .ant-table-thead > tr > th {
+  color: #000000 !important;
+  background: #fafafa !important;
+  font-weight: 600;
+}
+
+.ui-page .ant-table-tbody > tr > td {
+  color: #000000 !important;
+}
+
+.ui-page .ant-table-tbody > tr > td * {
+  color: #000000 !important;
+}
+
+.ui-page .ant-radio-wrapper {
+  color: #000000 !important;
+}
+
+.ui-page .ant-radio-wrapper span {
+  color: #000000 !important;
+}
+
+.ui-page .ant-select-selector {
+  color: #000000 !important;
+}
+
+.ui-page .ant-select-selection-item {
+  color: #000000 !important;
+}
+
+.ui-page .ant-input-number-input {
+  color: #000000 !important;
+}
+
+.ui-page .ant-input-number {
+  color: #000000 !important;
+}
+
+/* Đảm bảo tất cả text trong page đều có màu đen */
+.ui-page p,
+.ui-page span,
+.ui-page div:not(.ant-btn):not(.ant-input):not(.ant-select):not(.ant-radio-wrapper):not(.ant-card-head),
+.ui-page label {
+  color: #000000 !important;
+}
+
+/* Đảm bảo các phần tử có text đều có màu đen */
+.ui-page .ant-card-body p,
+.ui-page .ant-card-body span,
+.ui-page .ant-card-body div,
+.ui-page .ant-card-body label {
+  color: #000000 !important;
+}
+
+/* Trừ các phần tử cần màu khác */
+.ui-page .ant-btn-primary {
+  color: #fff !important;
+}
+
+.ui-page .anticon {
+  color: inherit !important;
+}
+
+.ui-page a {
+  color: #1890ff !important;
+}
+
+.ui-page .ant-typography[style*="color"] {
+  color: #000000 !important;
+}
+

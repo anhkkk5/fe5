@@ -1,0 +1,5 @@
+.candidate-detail-page .edit-icon,
+.candidate-detail-page .add-icon,
+.candidate-detail-page .delete-icon {
+  display: none !important;
+}

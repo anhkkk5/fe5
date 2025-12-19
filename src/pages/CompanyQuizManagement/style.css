@@ -1,0 +1,26 @@
+.company-quiz-management {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.company-quiz-management__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.company-quiz-management__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.company-quiz-management__header h1 {
+  font-size: 28px;
+  color: #333;
+  margin: 0;
+}
+

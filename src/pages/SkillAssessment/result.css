@@ -1,0 +1,145 @@
+.result {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.result__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.result__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.result__header h1 {
+  font-size: 28px;
+  color: #333;
+  margin: 0;
+}
+
+.result__summary {
+  margin-bottom: 32px;
+  border-radius: 12px;
+}
+
+.result__score {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 20px;
+}
+
+.result__score-circle {
+  text-align: center;
+}
+
+.result__score-label {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.result__score-details h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.result__score-stats {
+  display: flex;
+  gap: 32px;
+}
+
+.result__score-stats > div {
+  text-align: center;
+}
+
+.result__score-stats strong {
+  display: block;
+  font-size: 28px;
+  color: #16a34a;
+  margin-bottom: 4px;
+}
+
+.result__score-stats span {
+  font-size: 14px;
+  color: #666;
+}
+
+.result__questions h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.result__question-card {
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.result__question-card--correct {
+  border-left: 4px solid #16a34a;
+}
+
+.result__question-card--incorrect {
+  border-left: 4px solid #ef4444;
+}
+
+.result__question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.result__question-number {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.result__question-content {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.result__answer-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.result__answer-item {
+  margin-bottom: 16px;
+}
+
+.result__answer-item strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.result__answer-value {
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  color: #666;
+}
+
+.result__answer-value--correct {
+  background: #f0f9ff;
+  color: #16a34a;
+  font-weight: 500;
+}
+

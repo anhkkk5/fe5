@@ -1,0 +1,50 @@
+.personal-income-tax {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 40px 20px;
+}
+
+.tax-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.personal-income-tax .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.personal-income-tax .ant-card-head-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.personal-income-tax .ant-input-number {
+  width: 100%;
+}
+
+.personal-income-tax .ant-radio-group {
+  width: 100%;
+}
+
+.personal-income-tax .ant-table {
+  margin-top: 16px;
+}
+
+.personal-income-tax .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.personal-income-tax .ant-table-tbody > tr.even-row {
+  background-color: #f9f9f9;
+}
+
+.personal-income-tax .ant-table-tbody > tr.odd-row {
+  background-color: #ffffff;
+}
+
+.personal-income-tax .ant-divider {
+  margin: 16px 0;
+}
+

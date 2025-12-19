@@ -1,0 +1,86 @@
+.compound-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 40px 20px;
+}
+
+.compound-page__container {
+  max-width: 1050px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px 24px 32px;
+}
+
+.compound-page__title {
+  color: #16a34a;
+  margin-bottom: 4px !important;
+}
+
+.compound-page__subtitle {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.compound-page__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compound-page__card {
+  border-radius: 4px;
+}
+
+.compound-page__step-header {
+  background-color: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 16px;
+  margin: -16px -16px 12px;
+}
+
+.compound-page__label {
+  font-weight: 600;
+}
+
+.compound-page__description {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.compound-page__input,
+.compound-page__select {
+  width: 100% !important;
+}
+
+.compound-page__actions {
+  text-align: center;
+  margin: 20px 0 8px;
+}
+
+.compound-page__result {
+  margin-top: 12px;
+}
+
+.compound-page__result-title {
+  margin-bottom: 12px !important;
+}
+
+.compound-page__result-item {
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.compound-page__result-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.compound-page__result-value {
+  font-weight: 600;
+  margin-top: 4px;
+  color: #111827;
+}

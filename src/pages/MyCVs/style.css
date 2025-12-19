@@ -1,0 +1,63 @@
+.my-cvs-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.my-cvs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cv-preview-card {
+  transition: all 0.3s;
+}
+
+.cv-preview-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.cv-preview-container {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: #333;
+}
+
+.cv-preview-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cv-preview-avatar {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.cv-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cv-preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-preview-section {
+  padding: 4px 0;
+}
+
+.cv-preview-section:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}

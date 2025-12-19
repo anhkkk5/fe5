@@ -1,0 +1,66 @@
+.view-cv-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.view-cv-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Print styles - tương tự như CV page */
+@media print {
+  body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif !important;
+  }
+  body * {
+    visibility: hidden !important;
+    box-shadow: none !important;
+  }
+  .cv-print-area, .cv-print-area * {
+    visibility: visible !important;
+  }
+  .cv-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+  .ant-btn,
+  .view-cv-container > div:first-child {
+    display: none !important;
+  }
+  .ant-card {
+    box-shadow: none !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  .cv-print-area .ant-card-body { padding: 8px 0 !important; }
+  .cv-print-area .ant-typography { color: #111 !important; }
+  .cv-print-area h1, .cv-print-area h2, .cv-print-area h3, .cv-print-area h4 { 
+    color: #111 !important; 
+    margin: 8px 0 6px 0 !important; 
+  }
+  .cv-print-area h1 { font-size: 22px !important; }
+  .cv-print-area h2 { font-size: 18px !important; }
+  .cv-print-area h3 { font-size: 16px !important; }
+  .cv-print-area h4 { font-size: 14px !important; text-transform: uppercase; letter-spacing: .3px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  .cv-print-area p { margin: 4px 0 !important; line-height: 1.35; }
+  .cv-print-area .draggable-section { page-break-inside: avoid; break-inside: avoid; margin-bottom: 10px; }
+  .cv-print-area #section-profile { page-break-inside: avoid; break-inside: avoid; }
+  .cv-print-area .ant-tag { background: #f5f5f5 !important; color: #333 !important; border-color: #e5e5e5 !important; }
+  .cv-print-area .anticon { color: #444 !important; }
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+

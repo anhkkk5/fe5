@@ -1,0 +1,88 @@
+.grossnet-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 40px 20px;
+}
+
+.grossnet-page__container {
+  max-width: 1050px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px 24px 32px;
+}
+
+.grossnet {
+  padding: 0;
+}
+
+.grossnet__card {
+  border: 1px solid #e9ecef;
+}
+
+.grossnet__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  height: 100%;
+}
+
+.grossnet__info-label {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.grossnet__info-value {
+  color: #16a34a;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.grossnet__form {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.grossnet__input {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.grossnet__section {
+  margin-top: 16px;
+}
+
+.grossnet__radio-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.grossnet__result {
+  margin-top: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.grossnet__summary-item {
+  padding: 12px;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.grossnet__summary-label {
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.grossnet__summary-value {
+  font-weight: 600;
+  color: #111827;
+}
