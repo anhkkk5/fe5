@@ -136,6 +136,21 @@ export default function UpgradeAccount() {
                     <Text strong>Trạng thái: {topup?.status || "-"}</Text>
                     <Text>Số tiền (VND): {topup?.amount ?? "-"}</Text>
                     <Text>Nội dung chuyển khoản (bắt buộc): {topup?.paymentCode || "-"}</Text>
+
+                    {topup?.qrImageUrl ? (
+                      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                        <img
+                          src={topup.qrImageUrl}
+                          alt="QR thanh toán"
+                          style={{ maxWidth: 320, width: "100%", height: "auto" }}
+                        />
+                      </div>
+                    ) : null}
+
+                    {topup?.qrContent ? (
+                      <Text type="secondary">QR content: {topup.qrContent}</Text>
+                    ) : null}
+
                     <Text>
                       Ngân hàng: {topup?.bank?.bankName || "-"}
                     </Text>
