@@ -12,6 +12,7 @@ import {
   Input,
   DatePicker,
   Select,
+  Switch,
 } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
@@ -87,12 +88,35 @@ const formatDateRange = (start, end) => {
   return [s, e].filter(Boolean).join(" - ");
 };
 
+const formatYearRange = (start, end) => {
+  const s = start ? dayjs(start).format("YYYY") : "";
+  const e = end ? dayjs(end).format("YYYY") : "";
+  return [s, e].filter(Boolean).join(" - ");
+};
+
 const bulletize = (text) => {
   if (!text) return [];
   return text
     .split("\n")
     .map((t) => t.trim())
     .filter(Boolean);
+};
+
+const renderTextOrBullets = (text) => {
+  const items = bulletize(text);
+  if (items.length >= 2) {
+    return (
+      <ul className="cv-bullets">
+        {items.map((b, idx) => (
+          <li key={idx}>{b}</li>
+        ))}
+      </ul>
+    );
+  }
+  if (items.length === 1) {
+    return <Paragraph className="cv-paragraph">{items[0]}</Paragraph>;
+  }
+  return null;
 };
 
 function CVPage() {
@@ -131,6 +155,7 @@ function CVPage() {
   const [editingSkill, setEditingSkill] = useState(null);
   const [editingRef, setEditingRef] = useState(null);
   const [editingHobby, setEditingHobby] = useState(null);
+  const [previewMode, setPreviewMode] = useState(true);
   const [formEdu] = Form.useForm();
   const [formExp] = Form.useForm();
   const [formProj] = Form.useForm();
@@ -736,28 +761,46 @@ function CVPage() {
   return (
     <div className="cv-wrapper">
       <div className="cv-toolbar">
-        <Button onClick={() => setProfileModal(true)}>
-          Chỉnh sửa thông tin
-        </Button>
-        <Button onClick={() => setIntroModal(true)}>Chỉnh sửa mục tiêu</Button>
-        <Button
-          onClick={() => document.getElementById("avatar-input")?.click()}
-        >
-          Đổi ảnh
-        </Button>
-        <input
-          type="file"
-          id="avatar-input"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleAvatarChange}
-        />
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: 8 }}>
+          <Switch
+            checked={previewMode}
+            onChange={(v) => setPreviewMode(!!v)}
+          />
+          <span style={{ fontSize: 13, fontWeight: 600 }}>
+            {previewMode ? "Chế độ xem" : "Chế độ chỉnh sửa"}
+          </span>
+        </div>
+
+        {!previewMode ? (
+          <>
+            <Button onClick={() => setProfileModal(true)}>
+              Chỉnh sửa thông tin
+            </Button>
+            <Button onClick={() => setIntroModal(true)}>Chỉnh sửa mục tiêu</Button>
+            <Button
+              onClick={() => document.getElementById("avatar-input")?.click()}
+            >
+              Đổi ảnh
+            </Button>
+            <input
+              type="file"
+              id="avatar-input"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleAvatarChange}
+            />
+          </>
+        ) : null}
+
         <Button type="primary" onClick={handleDownload}>
           Tải PDF
         </Button>
       </div>
 
-      <div className="cv-sheet" ref={printAreaRef}>
+      <div
+        className={`cv-sheet${previewMode ? " preview-mode" : ""}`}
+        ref={printAreaRef}
+      >
         {/* Header */}
         <div className="cv-header">
           <div className="cv-avatar">
@@ -1135,7 +1178,7 @@ function CVPage() {
               key={`act-${latestActivity.id || latestActivity.organization}`}
             >
               <div className="cv-entry-time">
-                {formatDateRange(
+                {formatYearRange(
                   latestActivity.started_at || latestActivity.startDate,
                   latestActivity.end_at || latestActivity.endDate
                 )}
@@ -1148,11 +1191,7 @@ function CVPage() {
                 {latestActivity.role ? (
                   <div className="cv-entry-subtitle">{latestActivity.role}</div>
                 ) : null}
-                {latestActivity.description ? (
-                  <Paragraph className="cv-paragraph">
-                    {latestActivity.description}
-                  </Paragraph>
-                ) : null}
+                {renderTextOrBullets(latestActivity.description)}
                 <div className="cv-entry-actions">
                   <Button
                     size="small"
@@ -1225,7 +1264,7 @@ function CVPage() {
               }`}
             >
               <div className="cv-entry-time">
-                {formatDateRange(
+                {formatYearRange(
                   latestCertificate.started_at || latestCertificate.startDate,
                   latestCertificate.end_at || latestCertificate.endDate
                 )}
@@ -1241,11 +1280,7 @@ function CVPage() {
                     {latestCertificate.organization}
                   </div>
                 ) : null}
-                {latestCertificate.description ? (
-                  <Paragraph className="cv-paragraph">
-                    {latestCertificate.description}
-                  </Paragraph>
-                ) : null}
+                {renderTextOrBullets(latestCertificate.description)}
                 <div className="cv-entry-actions">
                   <Button
                     size="small"
@@ -1319,7 +1354,7 @@ function CVPage() {
               key={`award-${latestAward.id || latestAward.award_name}`}
             >
               <div className="cv-entry-time">
-                {formatDateRange(
+                {formatYearRange(
                   latestAward.started_at || latestAward.startDate,
                   latestAward.end_at || latestAward.endDate
                 )}
@@ -1336,11 +1371,7 @@ function CVPage() {
                     {latestAward.organization}
                   </div>
                 ) : null}
-                {latestAward.description ? (
-                  <Paragraph className="cv-paragraph">
-                    {latestAward.description}
-                  </Paragraph>
-                ) : null}
+                {renderTextOrBullets(latestAward.description)}
                 <div className="cv-entry-actions">
                   <Button
                     size="small"
@@ -1410,61 +1441,56 @@ function CVPage() {
           {skills.length === 0 ? (
             <Text type="secondary">Chưa cập nhật</Text>
           ) : (
-            <div>
+            <div className="cv-skill-grid">
               {skills.map((skill) => (
                 <div
-                  className="cv-entry"
+                  className="cv-skill-item"
                   key={`skill-${skill.id || skill.skill_name}`}
                 >
-                  <div className="cv-entry-body">
-                    <div className="cv-entry-title">
-                      <span className="cv-field-label">Kỹ năng:</span>{" "}
+                  <div className="cv-skill-head">
+                    <div className="cv-skill-name">
                       {skill.name || skill.skill_name || skill.skillName}
                     </div>
-                    {skill.level ? (
-                      <div className="cv-entry-subtitle">
-                        Mức độ: {skill.level}
-                      </div>
-                    ) : null}
-                    {skill.description ? (
-                      <Paragraph className="cv-paragraph">
-                        {skill.description}
-                      </Paragraph>
-                    ) : null}
-                    <div className="cv-entry-actions">
-                      <Button
-                        size="small"
-                        type="link"
-                        onClick={() => {
-                          setEditingSkill(skill);
-                          formSkill.setFieldsValue({
-                            skillName:
-                              skill.name || skill.skill_name || skill.skillName,
-                            level: skill.level,
-                            description: skill.description,
-                          });
-                          setSkillModal(true);
-                        }}
-                      >
-                        Sửa
-                      </Button>
-                      <Button
-                        size="small"
-                        type="link"
-                        danger
-                        onClick={async () => {
-                          try {
-                            await deleteSkill(skill.id);
-                            message.success("Đã xóa");
-                            await reloadSections();
-                          } catch (err) {
-                            message.error("Xóa thất bại");
-                          }
-                        }}
-                      >
-                        Xóa
-                      </Button>
+                    <div className="cv-skill-level">
+                      {skill.level ? skill.level : ""}
                     </div>
+                  </div>
+
+                  {renderTextOrBullets(skill.description)}
+
+                  <div className="cv-entry-actions">
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => {
+                        setEditingSkill(skill);
+                        formSkill.setFieldsValue({
+                          skillName:
+                            skill.name || skill.skill_name || skill.skillName,
+                          level: skill.level,
+                          description: skill.description,
+                        });
+                        setSkillModal(true);
+                      }}
+                    >
+                      Sửa
+                    </Button>
+                    <Button
+                      size="small"
+                      type="link"
+                      danger
+                      onClick={async () => {
+                        try {
+                          await deleteSkill(skill.id);
+                          message.success("Đã xóa");
+                          await reloadSections();
+                        } catch (err) {
+                          message.error("Xóa thất bại");
+                        }
+                      }}
+                    >
+                      Xóa
+                    </Button>
                   </div>
                 </div>
               ))}

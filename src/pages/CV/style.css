@@ -1,8 +1,8 @@
 /* ========== Layout mới kiểu CV cũ (không sidebar) ========== */
 
 .cv-wrapper {
-  max-width: 900px;
-  margin: 24px auto 40px;
+  max-width: 980px;
+  margin: 20px auto 40px;
   padding: 0 16px 32px;
 }
 
@@ -14,15 +14,21 @@
 
 .cv-sheet {
   background: #ffffff;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  padding: 24px 32px 32px;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  padding: 26px 34px 34px;
+  max-width: 794px;
+  margin: 0 auto;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: #111;
 }
 
 .cv-header {
   display: flex;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 22px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .cv-avatar {
@@ -30,10 +36,11 @@
 }
 
 .cv-avatar img {
-  width: 140px;
-  height: 140px;
-  border-radius: 4px;
+  width: 132px;
+  height: 132px;
+  border-radius: 6px;
   object-fit: cover;
+  border: 1px solid #e5e5e5;
 }
 
 .cv-summary {
@@ -41,27 +48,34 @@
 }
 
 .cv-name {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
 }
 
 .cv-position {
   display: block;
   margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
 }
 
 .cv-info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 24px;
+  gap: 6px 28px;
 }
 
 .cv-info-row {
   font-size: 13px;
+  line-height: 1.45;
 }
 
 .cv-info-label {
   font-weight: 600;
   margin-right: 4px;
+  color: #111;
 }
 
 .cv-info-value {
@@ -69,16 +83,17 @@
 }
 
 .cv-section {
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 .cv-section-title {
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 800;
+  font-size: 13px;
   text-transform: uppercase;
-  border-top: 1px solid #bbb;
-  padding-top: 8px;
-  margin-bottom: 8px;
+  letter-spacing: 0.6px;
+  padding: 0 0 8px 0;
+  margin: 0 0 10px 0;
+  border-bottom: 2px solid #111;
 }
 
 .cv-entry {
@@ -86,12 +101,15 @@
   gap: 12px;
   font-size: 13px;
   align-items: flex-start;
+  padding: 2px 0;
 }
 
 .cv-entry-time {
-  width: 130px;
+  width: 120px;
   flex-shrink: 0;
   color: #555;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 .cv-entry-body {
@@ -109,10 +127,25 @@
   padding: 0;
   height: auto;
   font-size: 13px;
+  color: #1677ff;
+}
+
+.cv-entry-actions .ant-btn {
+  border-radius: 6px;
+}
+
+.cv-entry-actions .ant-btn:not(.ant-btn-link) {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
 }
 
 /* Chế độ xuất PDF: ẩn toàn bộ nút thao tác trong CV */
 .cv-sheet.pdf-export .cv-entry-actions {
+  display: none !important;
+}
+
+.cv-sheet.preview-mode .cv-entry-actions {
   display: none !important;
 }
 
@@ -141,11 +174,86 @@
 
 .cv-paragraph {
   margin-bottom: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #222;
 }
 
 .cv-bullets {
   padding-left: 18px;
   margin: 4px 0 0;
+  line-height: 1.55;
+}
+
+.cv-bullets li {
+  margin: 3px 0;
+}
+
+.cv-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 22px;
+  row-gap: 10px;
+}
+
+.cv-skill-item {
+  padding: 2px 0;
+}
+
+.cv-skill-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cv-skill-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #111;
+}
+
+.cv-skill-level {
+  font-size: 12px;
+  color: #444;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .cv-sheet {
+    padding: 18px 16px 22px;
+    max-width: 100%;
+  }
+
+  .cv-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cv-avatar img {
+    width: 110px;
+    height: 110px;
+  }
+
+  .cv-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cv-entry {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cv-entry-time {
+    width: auto;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .cv-skill-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ========== Các style cũ (sidebar) vẫn giữ để không ảnh hưởng trang khác ========== */
