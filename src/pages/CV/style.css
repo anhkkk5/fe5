@@ -82,6 +82,68 @@
   color: #333;
 }
 
+.cv-edit-mode .cv-info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.cv-inline-input {
+  border: 1px dashed transparent;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  width: 100%;
+  max-width: 100%;
+  background: transparent;
+  outline: none;
+}
+
+.cv-inline-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.cv-inline-input:focus {
+  border-color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.03);
+}
+
+.cv-inline-textarea {
+  width: 100%;
+  border: 1px dashed transparent;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  background: transparent;
+  outline: none;
+}
+
+.cv-inline-textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.cv-inline-textarea:focus {
+  border-color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.03);
+}
+
+.cv-inline-title {
+  font-size: 30px;
+  font-weight: 800;
+  padding: 2px 6px;
+}
+
+.cv-inline-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 4px 0 10px;
+}
+
 .cv-section {
   margin-top: 18px;
 }

@@ -15,9 +15,10 @@ import {
   Switch,
 } from "antd";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
 import { getCookie } from "../../helpers/cookie";
+import { createCV, getMyCVs, updateCV } from "../../services/CVs/cvsServices";
 import {
   getMyCandidateProfile,
   uploadMyAvatar,
@@ -119,8 +120,32 @@ const renderTextOrBullets = (text) => {
   return null;
 };
 
+function InlineText({ value, placeholder, onChange, className }) {
+  return (
+    <input
+      className={`cv-inline-input${className ? ` ${className}` : ""}`}
+      value={value ?? ""}
+      placeholder={placeholder}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  );
+}
+
+function InlineArea({ value, placeholder, onChange, className, rows = 2 }) {
+  return (
+    <textarea
+      rows={rows}
+      className={`cv-inline-textarea${className ? ` ${className}` : ""}`}
+      value={value ?? ""}
+      placeholder={placeholder}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  );
+}
+
 function CVPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const printAreaRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [candidate, setCandidate] = useState(null);
@@ -156,6 +181,9 @@ function CVPage() {
   const [editingRef, setEditingRef] = useState(null);
   const [editingHobby, setEditingHobby] = useState(null);
   const [previewMode, setPreviewMode] = useState(true);
+  const [cvId, setCvId] = useState(null);
+  const [draft, setDraft] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [formEdu] = Form.useForm();
   const [formExp] = Form.useForm();
   const [formProj] = Form.useForm();
@@ -165,6 +193,45 @@ function CVPage() {
   const [formSkill] = Form.useForm();
   const [formRef] = Form.useForm();
   const [formHobby] = Form.useForm();
+
+  const getEditCvIdFromQuery = () => {
+    const params = new URLSearchParams(location.search);
+    const edit = params.get("edit");
+    return edit ? String(edit) : null;
+  };
+
+  const handleSaveCVSummary = async () => {
+    if (!draft) return;
+    try {
+      setSaving(true);
+      const title = draft?.candidate?.fullName || "CV";
+      const payload = {
+        title,
+        avatarUrl: draft?.candidate?.avatar || undefined,
+        summary: JSON.stringify(draft),
+      };
+
+      if (cvId) {
+        await updateCV(cvId, payload);
+        message.success("Đã lưu CV");
+      } else {
+        const created = await createCV(payload);
+        const newId = created?.id || created?.data?.id;
+        if (newId) {
+          setCvId(newId);
+          const params = new URLSearchParams(location.search);
+          params.set("edit", String(newId));
+          navigate(`/cv?${params.toString()}`);
+        }
+        message.success("Đã tạo CV");
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Lưu CV thất bại");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleDownload = async () => {
     if (!printAreaRef.current) return;
@@ -658,6 +725,26 @@ function CVPage() {
 
       try {
         setLoading(true);
+
+        const editCvId = getEditCvIdFromQuery();
+        if (editCvId) {
+          try {
+            const my = await getMyCVs();
+            const target = Array.isArray(my)
+              ? my.find((c) => String(c.id) === String(editCvId))
+              : null;
+            if (target?.summary) {
+              const parsed = JSON.parse(target.summary);
+              if (parsed && typeof parsed === "object") {
+                setCvId(target.id);
+                setDraft(parsed);
+              }
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
         const profile = await getMyCandidateProfile();
         const candidateId = profile?.id;
 
@@ -721,6 +808,49 @@ function CVPage() {
     loadData();
   }, [navigate]);
 
+  useEffect(() => {
+    if (draft) return;
+    if (!candidate) return;
+
+    setDraft({
+      candidate: {
+        fullName: candidate.fullName || candidate.name || "",
+        position: candidate.position || "",
+        dob: candidate.dob || "",
+        gender: candidate.gender ?? "",
+        phone: candidate.phone || "",
+        email: candidate.email || "",
+        website: candidate.linkedin || candidate.facebook || "",
+        address: candidate.address || "",
+        avatar: candidate.avatar || "",
+      },
+      intro: candidate.introduction || "",
+      education: Array.isArray(education) ? education : [],
+      experience: Array.isArray(experience) ? experience : [],
+      projects: Array.isArray(projects) ? projects : [],
+      activities: Array.isArray(activities) ? activities : [],
+      certificates: Array.isArray(certificates) ? certificates : [],
+      awards: Array.isArray(awards) ? awards : [],
+      skills: Array.isArray(skills) ? skills : [],
+      references: Array.isArray(references) ? references : [],
+      hobbies: Array.isArray(hobbies) ? hobbies : [],
+      sectionOrder: Array.isArray(draft?.sectionOrder)
+        ? draft.sectionOrder
+        : [
+            "intro",
+            "education",
+            "experience",
+            "projects",
+            "activities",
+            "certificates",
+            "awards",
+            "skills",
+            "references",
+            "hobbies",
+          ],
+    });
+  }, [draft, candidate, education, experience, projects, activities, certificates, awards, skills, references, hobbies]);
+
   if (loading) {
     return (
       <div style={{ padding: 50, textAlign: "center" }}>
@@ -773,10 +903,9 @@ function CVPage() {
 
         {!previewMode ? (
           <>
-            <Button onClick={() => setProfileModal(true)}>
-              Chỉnh sửa thông tin
+            <Button type="primary" loading={saving} onClick={handleSaveCVSummary}>
+              Lưu CV
             </Button>
-            <Button onClick={() => setIntroModal(true)}>Chỉnh sửa mục tiêu</Button>
             <Button
               onClick={() => document.getElementById("avatar-input")?.click()}
             >
@@ -798,7 +927,9 @@ function CVPage() {
       </div>
 
       <div
-        className={`cv-sheet${previewMode ? " preview-mode" : ""}`}
+        className={`cv-sheet${previewMode ? " preview-mode" : ""}${
+          !previewMode ? " cv-edit-mode" : ""
+        }`}
         ref={printAreaRef}
       >
         {/* Header */}
@@ -806,6 +937,7 @@ function CVPage() {
           <div className="cv-avatar">
             <img
               src={
+                draft?.candidate?.avatar ||
                 candidate.avatar ||
                 "https://res.cloudinary.com/demo/image/upload/v1691500000/sample.jpg"
               }
@@ -813,50 +945,165 @@ function CVPage() {
             />
           </div>
           <div className="cv-summary">
-            <Title level={2} className="cv-name">
-              {candidate.fullName || candidate.name || "Họ và tên"}
-            </Title>
-            <Text className="cv-position">
-              {candidate.position || "Business Development Executive"}
-            </Text>
+            {previewMode ? (
+              <Title level={2} className="cv-name">
+                {draft?.candidate?.fullName || candidate.fullName || candidate.name || "Họ và tên"}
+              </Title>
+            ) : (
+              <div className="cv-edit-title">
+                <InlineText
+                  value={draft?.candidate?.fullName}
+                  placeholder="Họ và tên"
+                  onChange={(v) =>
+                    setDraft((p) => ({
+                      ...(p || {}),
+                      candidate: { ...(p?.candidate || {}), fullName: v },
+                    }))
+                  }
+                  className="cv-inline-title"
+                />
+              </div>
+            )}
+
+            {previewMode ? (
+              <Text className="cv-position">
+                {draft?.candidate?.position || candidate.position || "Vị trí ứng tuyển"}
+              </Text>
+            ) : (
+              <InlineText
+                value={draft?.candidate?.position}
+                placeholder="Vị trí ứng tuyển"
+                onChange={(v) =>
+                  setDraft((p) => ({
+                    ...(p || {}),
+                    candidate: { ...(p?.candidate || {}), position: v },
+                  }))
+                }
+                className="cv-inline-subtitle"
+              />
+            )}
             <div className="cv-info-grid">
               <div className="cv-info-row">
                 <span className="cv-info-label">Ngày sinh:</span>
-                <span className="cv-info-value">
-                  {candidate.dob
-                    ? dayjs(candidate.dob).format("DD/MM/YYYY")
-                    : ""}
-                </span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.dob
+                      ? dayjs(draft.candidate.dob).format("DD/MM/YYYY")
+                      : candidate.dob
+                      ? dayjs(candidate.dob).format("DD/MM/YYYY")
+                      : ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.dob}
+                    placeholder="DD/MM/YYYY"
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), dob: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
               <div className="cv-info-row">
                 <span className="cv-info-label">Giới tính:</span>
-                <span className="cv-info-value">
-                  {candidate.gender === 1
-                    ? "Nam"
-                    : candidate.gender === 0
-                    ? "Nữ"
-                    : ""}
-                </span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.gender === 1 || candidate.gender === 1
+                      ? "Nam"
+                      : draft?.candidate?.gender === 0 || candidate.gender === 0
+                      ? "Nữ"
+                      : ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.gender}
+                    placeholder="Nam/Nữ"
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), gender: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
               <div className="cv-info-row">
                 <span className="cv-info-label">Số điện thoại:</span>
-                <span className="cv-info-value">{candidate.phone || ""}</span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.phone || candidate.phone || ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.phone}
+                    placeholder="0123 456 789"
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), phone: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
               <div className="cv-info-row">
                 <span className="cv-info-label">Email:</span>
-                <span className="cv-info-value">{candidate.email || ""}</span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.email || candidate.email || ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.email}
+                    placeholder="email@example.com"
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), email: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
               <div className="cv-info-row">
                 <span className="cv-info-label">Website:</span>
-                <span className="cv-info-value">
-                  {candidate.linkedin || candidate.facebook || ""}
-                </span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.website || candidate.linkedin || candidate.facebook || ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.website}
+                    placeholder="facebook.com/..."
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), website: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
               <div className="cv-info-row">
                 <span className="cv-info-label">Địa chỉ:</span>
-                <span className="cv-info-value">
-                  {candidate.address || "Chưa cập nhật"}
-                </span>
+                {previewMode ? (
+                  <span className="cv-info-value">
+                    {draft?.candidate?.address || candidate.address || ""}
+                  </span>
+                ) : (
+                  <InlineText
+                    value={draft?.candidate?.address}
+                    placeholder="Quận..., TP..."
+                    onChange={(v) =>
+                      setDraft((p) => ({
+                        ...(p || {}),
+                        candidate: { ...(p?.candidate || {}), address: v },
+                      }))
+                    }
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -865,10 +1112,20 @@ function CVPage() {
         {/* Mục tiêu nghề nghiệp */}
         <div className="cv-section">
           <div className="cv-section-title">MỤC TIÊU NGHỀ NGHIỆP</div>
-          <Paragraph className="cv-paragraph">
-            {candidate.introduction ||
-              "Thêm mục tiêu nghề nghiệp của bạn để gây ấn tượng với nhà tuyển dụng."}
-          </Paragraph>
+          {previewMode ? (
+            <Paragraph className="cv-paragraph">
+              {draft?.intro ||
+                candidate.introduction ||
+                "Thêm mục tiêu nghề nghiệp của bạn để gây ấn tượng với nhà tuyển dụng."}
+            </Paragraph>
+          ) : (
+            <InlineArea
+              value={draft?.intro}
+              placeholder="Mục tiêu nghề nghiệp của bạn..."
+              onChange={(v) => setDraft((p) => ({ ...(p || {}), intro: v }))}
+              rows={3}
+            />
+          )}
         </div>
 
         {/* Học vấn */}
