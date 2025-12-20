@@ -19,3 +19,8 @@ export const adminAdjustCompanyStars = async (companyId, amount) => {
   const result = await edit(`stars/admin/companies/${companyId}`, { amount });
   return result;
 };
+
+export const unlockCandidateContact = async (candidateId) => {
+  const result = await post("stars/unlock/contact", { candidateId });
+  return result;
+};

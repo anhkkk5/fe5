@@ -37,7 +37,7 @@ import { getDetaiJob, updateJob } from "../../services/jobServices/jobServices";
 import { getDetaiCompany } from "../../services/getAllCompany/companyServices";
 import { getLocationById } from "../../services/getAllLocation/locationServices";
 import { getCookie } from "../../helpers/cookie";
-import { get, edit, postForm } from "../../utils/axios/request";
+import { get, edit, post, postForm } from "../../utils/axios/request";
 
 import "./style.css";
 
@@ -62,6 +62,7 @@ function JobDetail() {
   const [isCandidate, setIsCandidate] = React.useState(false);
   const [updating, setUpdating] = React.useState(false);
   const [loadingApplications, setLoadingApplications] = React.useState(false);
+  const [unlockingCandidateId, setUnlockingCandidateId] = React.useState(null);
   const [hasApplied, setHasApplied] = React.useState(false);
   const [pdfModal, setPdfModal] = React.useState({
     open: false,
@@ -181,6 +182,9 @@ function JobDetail() {
           skills: [],
           language: "",
           location: app.candidate?.address || "",
+          email: app.candidate?.email || "",
+          phone: app.candidate?.phone || "",
+          contactUnlocked: !!app.candidate?.contactUnlocked,
           status: app.status || "pending",
           cvPdfUrl: app.cvPdfUrl || null, // URL của PDF CV
         }));
@@ -194,6 +198,39 @@ function JobDetail() {
 
     loadApplications();
   }, [id, isCompany]);
+
+  const handleUnlockContact = async (candidate) => {
+    const candidateId = candidate?.candidateId;
+    if (!candidateId) return;
+    try {
+      setUnlockingCandidateId(candidateId);
+      const res = await post("stars/unlock/contact", { candidateId });
+      message.success(`Đã mở khóa liên hệ (còn ${res?.stars ?? "?"} sao)`);
+      setAppliedCandidates((prev) =>
+        prev.map((c) =>
+          c.candidateId === candidateId
+            ? {
+                ...c,
+                contactUnlocked: true,
+                email: res?.contact?.email || c.email,
+                phone: res?.contact?.phone || c.phone,
+              }
+            : c
+        )
+      );
+    } catch (error) {
+      const backendMsg = error?.response?.data?.message;
+      message.error(
+        backendMsg
+          ? Array.isArray(backendMsg)
+            ? backendMsg.join(", ")
+            : backendMsg
+          : "Mở khóa liên hệ thất bại"
+      );
+    } finally {
+      setUnlockingCandidateId(null);
+    }
+  };
 
   // Check if current candidate already applied this job
   React.useEffect(() => {
@@ -735,6 +772,22 @@ function JobDetail() {
                                       <Text>{candidate.location}</Text>
                                     </div>
                                   )}
+
+                                  {(candidate.email || candidate.phone) && (
+                                    <div style={{ marginTop: 4 }}>
+                                      {candidate.email && (
+                                        <div>
+                                          <MailOutlined style={{ marginRight: 6 }} />
+                                          <Text>{candidate.email}</Text>
+                                        </div>
+                                      )}
+                                      {candidate.phone && (
+                                        <div>
+                                          <Text>SDT: {candidate.phone}</Text>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="candidate-actions">
                                   {candidate.cvPdfUrl && (
@@ -751,6 +804,21 @@ function JobDetail() {
                                       Xem CV
                                     </Button>
                                   )}
+
+                                  {!candidate.contactUnlocked && (
+                                    <Button
+                                      size="small"
+                                      type="primary"
+                                      loading={unlockingCandidateId === candidate.candidateId}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUnlockContact(candidate);
+                                      }}
+                                    >
+                                      Mở khóa (1 sao)
+                                    </Button>
+                                  )}
+
                                   {group.key === "pending" && (
                                     <>
                                       <Button
