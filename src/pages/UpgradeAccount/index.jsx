@@ -74,6 +74,9 @@ export default function UpgradeAccount() {
           pollingRef.current = null;
           message.success("Thanh toán thành công! Đang cập nhật số sao...");
           await load();
+          setTimeout(() => {
+            window.location.reload();
+          }, 800);
         }
       } catch (_) {}
     }, 3000);
@@ -137,7 +140,7 @@ export default function UpgradeAccount() {
                     <Text>Số tiền (VND): {topup?.amount ?? "-"}</Text>
                     <Text>Nội dung chuyển khoản (bắt buộc): {topup?.paymentCode || "-"}</Text>
 
-                    {topup?.qrImageUrl ? (
+                    {topup?.status !== "PAID" && topup?.qrImageUrl ? (
                       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                         <img
                           src={topup.qrImageUrl}
