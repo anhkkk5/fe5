@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Button, Spin, Empty, Tag, message, Modal, Form, Input, InputNumber, Upload, Table, Space } from "antd";
 import { StarOutlined, GlobalOutlined, EnvironmentOutlined, UploadOutlined } from "@ant-design/icons";
 import { get, post } from "../../utils/axios/request";
+import { getCookie } from "../../helpers/cookie.jsx";
 import { uploadImage } from "../../services/Cloudinary/cloudinaryServices";
 import "./style.css";
 
@@ -22,7 +23,9 @@ function AdsRent() {
     const fetchSlots = async () => {
       try {
         setLoading(true);
-        const data = await get("ad-slots/available");
+        const userType = getCookie("userType");
+        const endpoint = userType === "company" ? "ad-slots/available/me" : "ad-slots/available";
+        const data = await get(endpoint);
         setSlots(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error loading ad slots", error);

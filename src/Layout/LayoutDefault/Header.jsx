@@ -208,7 +208,6 @@ function Header() {
       ? toolShortcuts.filter(
           (item) =>
             item.key !== "skill-assessment" &&
-            item.key !== "ads-rent" &&
             item.key !== "company-reviews"
         )
       : toolShortcuts;

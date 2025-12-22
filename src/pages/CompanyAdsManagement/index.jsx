@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Table, Tag, Button, message, Spin, Form, InputNumber, Input, Switch, Space } from "antd";
-import { get, edit, post } from "../../utils/axios/request";
+import { get, edit, post, del } from "../../utils/axios/request";
 import "./style.css";
 
 const statusColors = {
@@ -85,6 +85,22 @@ function CompanyAdsManagement() {
     }
   };
 
+  const handleDeleteBooking = async (id) => {
+    const ok = window.confirm("Bạn có chắc muốn xóa yêu cầu thuê quảng cáo này?");
+    if (!ok) return;
+    try {
+      setUpdatingBooking(true);
+      await del(`ad-bookings/${id}`);
+      message.success("Đã xóa yêu cầu");
+      loadData();
+    } catch (error) {
+      console.error("Error deleting booking", error);
+      message.error("Không thể xóa yêu cầu");
+    } finally {
+      setUpdatingBooking(false);
+    }
+  };
+
   const columns = [
     {
       title: "Người thuê",
@@ -135,6 +151,9 @@ function CompanyAdsManagement() {
               </Button>
             </>
           )}
+          <Button size="small" danger onClick={() => handleDeleteBooking(record.id)}>
+            Xóa
+          </Button>
         </Space.Compact>
       ),
     },
