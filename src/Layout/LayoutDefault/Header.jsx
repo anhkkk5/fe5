@@ -44,6 +44,7 @@ import { getAllCompany, getMyCompany, updateMyCompany } from "../../services/get
 import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
 import { decodeJwt } from "../../services/auth/authServices";
 import { getMyNotifications } from "../../services/notifications/notificationsServices";
+import { connectSocket, disconnectSocket } from "../../realtime/socketClient";
 import logoImage from "../../assets/logologin.png";
 
 function Header() {
@@ -184,7 +185,29 @@ function Header() {
       }
     };
     loadUnreadNotifications();
+
+    // connect socket for realtime notifications
+    connectSocket();
   }, [location.pathname]);
+
+  useEffect(() => {
+    const onNewNotification = () => {
+      setUnreadNotifications((prev) => (Number(prev) || 0) + 1);
+    };
+
+    try {
+      window.addEventListener("notification:new", onNewNotification);
+    } catch (_e) {}
+
+    return () => {
+      try {
+        window.removeEventListener("notification:new", onNewNotification);
+      } catch (_e) {}
+
+      const token = getCookie("token") || localStorage.getItem("token");
+      if (!token) disconnectSocket();
+    };
+  }, []);
 
   // Company auto fetch
   useEffect(() => {

@@ -46,6 +46,27 @@ function NotificationsPage() {
     load();
   }, []);
 
+  useEffect(() => {
+    const onNewNotification = (evt) => {
+      const n = evt?.detail;
+      if (!n?.id) return;
+      setItems((prev) => {
+        if (prev.some((x) => x?.id === n.id)) return prev;
+        return [n, ...prev];
+      });
+    };
+
+    try {
+      window.addEventListener("notification:new", onNewNotification);
+    } catch (_e) {}
+
+    return () => {
+      try {
+        window.removeEventListener("notification:new", onNewNotification);
+      } catch (_e) {}
+    };
+  }, []);
+
   const onMarkRead = async (id) => {
     try {
       await markNotificationRead(id);
