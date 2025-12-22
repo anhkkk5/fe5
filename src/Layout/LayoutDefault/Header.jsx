@@ -38,11 +38,12 @@ import {
   BarChartOutlined,
 } from "@ant-design/icons";
 
-import { Dropdown, Menu } from "antd";
+import { Badge, Dropdown, Menu } from "antd";
 
 import { getAllCompany, getMyCompany, updateMyCompany } from "../../services/getAllCompany/companyServices";
 import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
 import { decodeJwt } from "../../services/auth/authServices";
+import { getMyNotifications } from "../../services/notifications/notificationsServices";
 import logoImage from "../../assets/logologin.png";
 
 function Header() {
@@ -51,6 +52,7 @@ function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [userType, setUserType] = useState("");
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [companyId, setCompanyId] = useState("");
   const [companies, setCompanies] = useState([]);
   const [isJobMenuOpen, setIsJobMenuOpen] = useState(false);
@@ -119,6 +121,7 @@ function Header() {
       setUserType("");
       setUserName("");
       setCompanyId("");
+      setUnreadNotifications(0);
       return;
     }
 
@@ -156,6 +159,18 @@ function Header() {
     if (type === "company" && id) {
       setCompanyId(id);
     }
+
+    const loadUnreadNotifications = async () => {
+      try {
+        const data = await getMyNotifications();
+        const list = Array.isArray(data) ? data : [];
+        const unread = list.filter((n) => !n?.read || n?.read === 0).length;
+        setUnreadNotifications(unread);
+      } catch (_e) {
+        setUnreadNotifications(0);
+      }
+    };
+    loadUnreadNotifications();
   }, [location.pathname]);
 
   // Company auto fetch
@@ -681,10 +696,18 @@ function Header() {
           <div className="header__actions">
             {isLoggedIn ? (
               <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-                <BellOutlined
-                  style={{ fontSize: "24px", color: "#c41e3a", cursor: "pointer" }}
-                  onClick={() => navigate("/notifications")}
-                />
+                <Badge
+                  count={unreadNotifications}
+                  overflowCount={99}
+                  size="small"
+                  offset={[0, 2]}
+                  showZero={false}
+                >
+                  <BellOutlined
+                    style={{ fontSize: "24px", color: "#c41e3a", cursor: "pointer" }}
+                    onClick={() => navigate("/notifications")}
+                  />
+                </Badge>
 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
