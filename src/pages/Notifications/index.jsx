@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, List, Space, Spin, Tag, Typography, message } from "antd";
+import { Button, Card, List, Popconfirm, Space, Spin, Tag, Typography, message } from "antd";
 import { BellOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import "./style.css";
 import {
   getMyNotifications,
+  deleteNotification,
   markNotificationRead,
 } from "../../services/notifications/notificationsServices";
 
@@ -51,6 +52,23 @@ function NotificationsPage() {
       setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: 1 } : n)));
     } catch (e) {
       message.error("Không thể đánh dấu đã đọc");
+    }
+  };
+
+  const onDelete = async (id) => {
+    try {
+      await deleteNotification(id);
+      setItems((prev) => prev.filter((n) => n.id !== id));
+      message.success("Đã xóa thông báo");
+    } catch (e) {
+      const backendMsg = e?.response?.data?.message;
+      message.error(
+        backendMsg
+          ? Array.isArray(backendMsg)
+            ? backendMsg.join(", ")
+            : backendMsg
+          : "Không thể xóa thông báo"
+      );
     }
   };
 
@@ -112,6 +130,20 @@ function NotificationsPage() {
                       >
                         Mở
                       </Button>
+                    ) : null}
+
+                    {item.read ? (
+                      <Popconfirm
+                        title="Xóa thông báo"
+                        description="Bạn có chắc muốn xóa thông báo này?"
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        onConfirm={() => onDelete(item.id)}
+                      >
+                        <Button size="small" danger>
+                          Xóa
+                        </Button>
+                      </Popconfirm>
                     ) : null}
                   </div>
                 </div>

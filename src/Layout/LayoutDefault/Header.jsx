@@ -164,7 +164,20 @@ function Header() {
       try {
         const data = await getMyNotifications();
         const list = Array.isArray(data) ? data : [];
-        const unread = list.filter((n) => !n?.read || n?.read === 0).length;
+        const unread = list.filter((n) => {
+          const raw =
+            typeof n?.read !== "undefined"
+              ? n.read
+              : typeof n?.isRead !== "undefined"
+              ? n.isRead
+              : // fallback (some APIs use snake_case)
+                n?.is_read;
+
+          if (raw === null || typeof raw === "undefined") return true;
+          if (raw === false) return true;
+          const num = Number(raw);
+          return Number.isNaN(num) ? !raw : num === 0;
+        }).length;
         setUnreadNotifications(unread);
       } catch (_e) {
         setUnreadNotifications(0);
