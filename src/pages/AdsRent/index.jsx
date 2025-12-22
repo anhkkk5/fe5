@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Spin, Empty, Tag, message, Modal, Form, Input, InputNumber, Upload } from "antd";
-import { DollarOutlined, GlobalOutlined, EnvironmentOutlined, UploadOutlined } from "@ant-design/icons";
+import { Card, Button, Spin, Empty, Tag, message, Modal, Form, Input, InputNumber, Upload, Table, Space } from "antd";
+import { StarOutlined, GlobalOutlined, EnvironmentOutlined, UploadOutlined } from "@ant-design/icons";
 import { get, post } from "../../utils/axios/request";
 import { uploadImage } from "../../services/Cloudinary/cloudinaryServices";
 import "./style.css";
@@ -8,6 +8,9 @@ import "./style.css";
 function AdsRent() {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [myBookings, setMyBookings] = useState([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+  const [payingBookingId, setPayingBookingId] = useState(null);
   const [rentModalOpen, setRentModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bannerUrl, setBannerUrl] = useState("");
@@ -29,8 +32,33 @@ function AdsRent() {
       }
     };
 
+    const fetchMyBookings = async () => {
+      try {
+        setLoadingBookings(true);
+        const data = await get("ad-bookings/advertiser/me");
+        setMyBookings(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error loading my ad bookings", error);
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+
     fetchSlots();
+    fetchMyBookings();
   }, []);
+
+  const refreshMyBookings = async () => {
+    try {
+      setLoadingBookings(true);
+      const data = await get("ad-bookings/advertiser/me");
+      setMyBookings(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error loading my ad bookings", error);
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
 
   const handleOpenRentModal = (slot) => {
     setSelectedSlot(slot);
@@ -72,6 +100,7 @@ function AdsRent() {
       });
       message.success("Gửi yêu cầu thuê quảng cáo thành công");
       setRentModalOpen(false);
+      refreshMyBookings();
     } catch (error) {
       console.error("Error creating ad booking", error);
       const backendMsg = error?.response?.data?.message;
@@ -87,12 +116,120 @@ function AdsRent() {
     }
   };
 
+  const handlePayBooking = async (bookingId) => {
+    try {
+      setPayingBookingId(bookingId);
+      await post(`ad-bookings/${bookingId}/pay`);
+      message.success("Thanh toán bằng sao thành công");
+      refreshMyBookings();
+    } catch (error) {
+      console.error("Error paying booking", error);
+      const backendMsg = error?.response?.data?.message;
+      message.error(
+        backendMsg
+          ? Array.isArray(backendMsg)
+            ? backendMsg.join(", ")
+            : backendMsg
+          : "Thanh toán thất bại"
+      );
+    } finally {
+      setPayingBookingId(null);
+    }
+  };
+
+  const isBookingActiveNow = (record) => {
+    if (!record?.startDate || !record?.endDate) return false;
+    const now = new Date();
+    const start = new Date(record.startDate);
+    const end = new Date(record.endDate);
+    return start <= now && end >= now;
+  };
+
+  const bookingColumns = [
+    {
+      title: "Công ty",
+      dataIndex: ["slot", "company", "companyName"],
+      key: "company",
+      render: (_, record) => record.slot?.company?.companyName || "N/A",
+    },
+    {
+      title: "Tiêu đề",
+      dataIndex: "title",
+      key: "title",
+    },
+    {
+      title: "Số tháng",
+      dataIndex: "months",
+      key: "months",
+    },
+    {
+      title: "Tổng sao",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      render: (v) => `${(v || 0).toLocaleString("vi-VN")} sao`,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (s) => <Tag color={s === "approved" ? "green" : s === "rejected" ? "red" : "gold"}>{s}</Tag>,
+    },
+    {
+      title: "Thanh toán",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (p) => <Tag color={p === "paid" ? "green" : "red"}>{p}</Tag>,
+    },
+    {
+      title: "Thời hạn",
+      key: "duration",
+      render: (_, record) => {
+        if (record.status !== "approved" || record.paymentStatus !== "paid") {
+          return <Tag>Chưa chạy</Tag>;
+        }
+        return isBookingActiveNow(record) ? <Tag color="green">Đang chạy</Tag> : <Tag color="red">Hết hạn</Tag>;
+      },
+    },
+    {
+      title: "Hành động",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          {record.status === "approved" && record.paymentStatus === "unpaid" && (
+            <Button
+              type="primary"
+              onClick={() => handlePayBooking(record.id)}
+              loading={payingBookingId === record.id}
+            >
+              Thanh toán bằng sao
+            </Button>
+          )}
+          {record.status === "approved" && record.paymentStatus === "paid" && !isBookingActiveNow(record) && (
+            <Button onClick={() => handleOpenRentModal(record.slot)}>
+              Gia hạn / Thuê mới
+            </Button>
+          )}
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <div className="ads-rent">
       <div className="ads-rent__header">
         <h1>Thuê quảng cáo</h1>
         <p>Chọn doanh nghiệp và thuê vị trí quảng cáo nổi bật trên trang công ty.</p>
       </div>
+
+      <Card title="Yêu cầu thuê quảng cáo của tôi" style={{ marginBottom: 16 }}>
+        <Table
+          rowKey="id"
+          dataSource={myBookings}
+          columns={bookingColumns}
+          pagination={{ pageSize: 5 }}
+          loading={loadingBookings}
+        />
+      </Card>
 
       {loading ? (
         <div className="ads-rent__loading">
@@ -138,8 +275,8 @@ function AdsRent() {
                 <h3>{slot.company?.companyName || "Doanh nghiệp"}</h3>
                 <div className="ads-rent__card-meta">
                   <Tag color="red">Banner trang công ty</Tag>
-                  <Tag icon={<DollarOutlined />} color="green">
-                    {slot.basePricePerMonth.toLocaleString("vi-VN")} VND / tháng
+                  <Tag icon={<StarOutlined />} color="green">
+                    {slot.basePricePerMonth.toLocaleString("vi-VN")} sao / tháng
                   </Tag>
                 </div>
                 {slot.company?.address && (

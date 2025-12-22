@@ -85,20 +85,6 @@ function CompanyAdsManagement() {
     }
   };
 
-  const handleUpdatePayment = async (id, paymentStatus) => {
-    try {
-      setUpdatingBooking(true);
-      await edit(`ad-bookings/${id}/payment`, { paymentStatus });
-      message.success("Cập nhật thanh toán thành công");
-      loadData();
-    } catch (error) {
-      console.error("Error updating booking payment", error);
-      message.error("Không thể cập nhật thanh toán");
-    } finally {
-      setUpdatingBooking(false);
-    }
-  };
-
   const columns = [
     {
       title: "Người thuê",
@@ -117,10 +103,10 @@ function CompanyAdsManagement() {
       key: "months",
     },
     {
-      title: "Tổng tiền",
+      title: "Tổng sao",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      render: (value) => `${(value || 0).toLocaleString("vi-VN")} VND`,
+      render: (value) => `${(value || 0).toLocaleString("vi-VN")} sao`,
     },
     {
       title: "Trạng thái",
@@ -148,11 +134,6 @@ function CompanyAdsManagement() {
                 Không duyệt
               </Button>
             </>
-          )}
-          {record.status === "approved" && record.paymentStatus === "unpaid" && (
-            <Button size="small" onClick={() => handleUpdatePayment(record.id, "paid")}>
-              Đánh dấu đã thanh toán
-            </Button>
           )}
         </Space.Compact>
       ),
@@ -188,12 +169,12 @@ function CompanyAdsManagement() {
 
           <Form.Item
             name="basePricePerMonth"
-            label="Giá / tháng (VND)"
+            label="Giá / tháng (sao)"
             rules={[{ required: true, message: "Vui lòng nhập giá" }]}
           >
             <InputNumber
               min={0}
-              step={100000}
+              step={1}
               style={{ minWidth: 180 }}
               formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               parser={(value) => value.replace(/\s|\./g, "").replace(/,/g, "")}

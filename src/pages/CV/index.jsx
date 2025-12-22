@@ -200,7 +200,8 @@ function CVPage() {
     return edit ? String(edit) : null;
   };
 
-  const handleSaveCVSummary = async () => {
+  const handleSaveCVSummary = async (options = {}) => {
+    const { silent = false, navigateAfterCreate = true } = options;
     if (!draft) return;
     try {
       setSaving(true);
@@ -213,21 +214,23 @@ function CVPage() {
 
       if (cvId) {
         await updateCV(cvId, payload);
-        message.success("Đã lưu CV");
+        if (!silent) message.success("Đã lưu CV");
       } else {
         const created = await createCV(payload);
         const newId = created?.id || created?.data?.id;
         if (newId) {
           setCvId(newId);
-          const params = new URLSearchParams(location.search);
-          params.set("edit", String(newId));
-          navigate(`/cv?${params.toString()}`);
+          if (navigateAfterCreate) {
+            const params = new URLSearchParams(location.search);
+            params.set("edit", String(newId));
+            navigate(`/cv?${params.toString()}`);
+          }
         }
-        message.success("Đã tạo CV");
+        if (!silent) message.success("Đã tạo CV");
       }
     } catch (err) {
       console.error(err);
-      message.error("Lưu CV thất bại");
+      if (!silent) message.error("Lưu CV thất bại");
     } finally {
       setSaving(false);
     }
@@ -235,6 +238,10 @@ function CVPage() {
 
   const handleDownload = async () => {
     if (!printAreaRef.current) return;
+
+    if (draft) {
+      await handleSaveCVSummary({ silent: true, navigateAfterCreate: false });
+    }
 
     const sheetEl = printAreaRef.current;
     sheetEl.classList.add("pdf-export");
@@ -881,12 +888,65 @@ function CVPage() {
     })[0];
   };
 
-  const latestEducation = pickLatestByStartDate(education);
-  const latestExperience = pickLatestByStartDate(experience);
-  const latestProject = pickLatestByStartDate(projects);
-  const latestActivity = pickLatestByStartDate(activities);
-  const latestCertificate = pickLatestByStartDate(certificates);
-  const latestAward = pickLatestByStartDate(awards);
+  const educationSorted = Array.isArray(education)
+    ? [...education].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
+
+  const experienceSorted = Array.isArray(experience)
+    ? [...experience].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
+
+  const projectsSorted = Array.isArray(projects)
+    ? [...projects].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
+
+  const activitiesSorted = Array.isArray(activities)
+    ? [...activities].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
+
+  const certificatesSorted = Array.isArray(certificates)
+    ? [...certificates].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
+
+  const awardsSorted = Array.isArray(awards)
+    ? [...awards].sort((a, b) => {
+        const aStart = a.started_at || a.startDate;
+        const bStart = b.started_at || b.startDate;
+        const aDate = aStart ? new Date(aStart) : 0;
+        const bDate = bStart ? new Date(bStart) : 0;
+        return bDate - aDate;
+      })
+    : [];
 
   return (
     <div className="cv-wrapper">
@@ -1143,81 +1203,80 @@ function CVPage() {
               Thêm học vấn
             </Button>
           </div>
-          {!latestEducation ? (
+          {educationSorted.length === 0 ? (
             <Text type="secondary">Chưa cập nhật</Text>
           ) : (
-            <div
-              className="cv-entry"
-              key={`edu-${
-                latestEducation.id || latestEducation.name_education
-              }`}
-            >
-              <div className="cv-entry-time">
-                {formatDateRange(
-                  latestEducation.started_at || latestEducation.startDate,
-                  latestEducation.end_at || latestEducation.endDate
-                )}
-              </div>
-              <div className="cv-entry-body">
-                <div className="cv-entry-title">
-                  <span className="cv-field-label">Trường:</span>{" "}
-                  {latestEducation.name_education || latestEducation.school}
+            <div>
+              {educationSorted.map((edu) => (
+                <div
+                  className="cv-entry"
+                  key={`edu-${edu.id || edu.name_education || edu.school}`}
+                >
+                  <div className="cv-entry-time">
+                    {formatDateRange(
+                      edu.started_at || edu.startDate,
+                      edu.end_at || edu.endDate
+                    )}
+                  </div>
+                  <div className="cv-entry-body">
+                    <div className="cv-entry-title">
+                      <span className="cv-field-label">Trường:</span>{" "}
+                      {edu.name_education || edu.school}
+                    </div>
+                    <div className="cv-entry-subtitle">
+                      Chuyên ngành: {edu.major || ""}
+                    </div>
+                    {edu.info || edu.description ? (
+                      <Paragraph className="cv-paragraph">
+                        {edu.info || edu.description}
+                      </Paragraph>
+                    ) : null}
+                    <div className="cv-entry-actions">
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => {
+                          setEditingEdu(edu);
+                          formEdu.setFieldsValue({
+                            school: edu.name_education || edu.school,
+                            major: edu.major,
+                            startDate: edu.started_at
+                              ? dayjs(edu.started_at)
+                              : edu.startDate
+                              ? dayjs(edu.startDate)
+                              : null,
+                            endDate: edu.end_at
+                              ? dayjs(edu.end_at)
+                              : edu.endDate
+                              ? dayjs(edu.endDate)
+                              : null,
+                            description: edu.info || edu.description,
+                          });
+                          setEduModal(true);
+                        }}
+                      >
+                        Sửa
+                      </Button>
+                      <Button
+                        size="small"
+                        type="link"
+                        danger
+                        onClick={async () => {
+                          try {
+                            await deleteEducation(edu.id);
+                            message.success("Đã xóa");
+                            await reloadSections();
+                          } catch (err) {
+                            message.error("Xóa thất bại");
+                          }
+                        }}
+                      >
+                        Xóa
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="cv-entry-subtitle">
-                  Chuyên ngành: {latestEducation.major || ""}
-                </div>
-                {latestEducation.info || latestEducation.description ? (
-                  <Paragraph className="cv-paragraph">
-                    {latestEducation.info || latestEducation.description}
-                  </Paragraph>
-                ) : null}
-                <div className="cv-entry-actions">
-                  <Button
-                    size="small"
-                    type="link"
-                    onClick={() => {
-                      setEditingEdu(latestEducation);
-                      formEdu.setFieldsValue({
-                        school:
-                          latestEducation.name_education ||
-                          latestEducation.school,
-                        major: latestEducation.major,
-                        startDate: latestEducation.started_at
-                          ? dayjs(latestEducation.started_at)
-                          : latestEducation.startDate
-                          ? dayjs(latestEducation.startDate)
-                          : null,
-                        endDate: latestEducation.end_at
-                          ? dayjs(latestEducation.end_at)
-                          : latestEducation.endDate
-                          ? dayjs(latestEducation.endDate)
-                          : null,
-                        description:
-                          latestEducation.info || latestEducation.description,
-                      });
-                      setEduModal(true);
-                    }}
-                  >
-                    Sửa
-                  </Button>
-                  <Button
-                    size="small"
-                    type="link"
-                    danger
-                    onClick={async () => {
-                      try {
-                        await deleteEducation(latestEducation.id);
-                        message.success("Đã xóa");
-                        await reloadSections();
-                      } catch (err) {
-                        message.error("Xóa thất bại");
-                      }
-                    }}
-                  >
-                    Xóa
-                  </Button>
-                </div>
-              </div>
+              ))}
             </div>
           )}
         </div>
@@ -1237,83 +1296,73 @@ function CVPage() {
               Thêm kinh nghiệm
             </Button>
           </div>
-          {!latestExperience ? (
+          {experienceSorted.length === 0 ? (
             <Text type="secondary">Chưa cập nhật</Text>
           ) : (
-            <div
-              className="cv-entry"
-              key={`exp-${latestExperience.id || latestExperience.company}`}
-            >
-              <div className="cv-entry-time">
-                {formatDateRange(
-                  latestExperience.started_at || latestExperience.startDate,
-                  latestExperience.end_at || latestExperience.endDate
-                )}
-              </div>
-              <div className="cv-entry-body">
-                <div className="cv-entry-title">
-                  <span className="cv-field-label">Công ty:</span>{" "}
-                  {latestExperience.company}
+            <div>
+              {experienceSorted.map((exp) => (
+                <div className="cv-entry" key={`exp-${exp.id || exp.company}`}>
+                  <div className="cv-entry-time">
+                    {formatDateRange(
+                      exp.started_at || exp.startDate,
+                      exp.end_at || exp.endDate
+                    )}
+                  </div>
+                  <div className="cv-entry-body">
+                    <div className="cv-entry-title">
+                      <span className="cv-field-label">Công ty:</span>{" "}
+                      {exp.company}
+                    </div>
+                    <div className="cv-entry-subtitle">
+                      {exp.position || "Vị trí"}
+                    </div>
+                    {renderTextOrBullets(exp.info || exp.description)}
+                    <div className="cv-entry-actions">
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => {
+                          setEditingExp(exp);
+                          formExp.setFieldsValue({
+                            position: exp.position,
+                            company: exp.company,
+                            startDate: exp.started_at
+                              ? dayjs(exp.started_at)
+                              : exp.startDate
+                              ? dayjs(exp.startDate)
+                              : null,
+                            endDate: exp.end_at
+                              ? dayjs(exp.end_at)
+                              : exp.endDate
+                              ? dayjs(exp.endDate)
+                              : null,
+                            description: exp.info || exp.description,
+                          });
+                          setExpModal(true);
+                        }}
+                      >
+                        Sửa
+                      </Button>
+                      <Button
+                        size="small"
+                        type="link"
+                        danger
+                        onClick={async () => {
+                          try {
+                            await deleteExperience(exp.id);
+                            message.success("Đã xóa");
+                            await reloadSections();
+                          } catch (err) {
+                            message.error("Xóa thất bại");
+                          }
+                        }}
+                      >
+                        Xóa
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="cv-entry-subtitle">
-                  {latestExperience.position || "Vị trí"}
-                </div>
-                {bulletize(
-                  latestExperience.info || latestExperience.description
-                ).length > 0 ? (
-                  <ul className="cv-bullets">
-                    {bulletize(
-                      latestExperience.info || latestExperience.description
-                    ).map((b, idx) => (
-                      <li key={idx}>{b}</li>
-                    ))}
-                  </ul>
-                ) : null}
-                <div className="cv-entry-actions">
-                  <Button
-                    size="small"
-                    type="link"
-                    onClick={() => {
-                      setEditingExp(latestExperience);
-                      formExp.setFieldsValue({
-                        position: latestExperience.position,
-                        company: latestExperience.company,
-                        startDate: latestExperience.started_at
-                          ? dayjs(latestExperience.started_at)
-                          : latestExperience.startDate
-                          ? dayjs(latestExperience.startDate)
-                          : null,
-                        endDate: latestExperience.end_at
-                          ? dayjs(latestExperience.end_at)
-                          : latestExperience.endDate
-                          ? dayjs(latestExperience.endDate)
-                          : null,
-                        description:
-                          latestExperience.info || latestExperience.description,
-                      });
-                      setExpModal(true);
-                    }}
-                  >
-                    Sửa
-                  </Button>
-                  <Button
-                    size="small"
-                    type="link"
-                    danger
-                    onClick={async () => {
-                      try {
-                        await deleteExperience(latestExperience.id);
-                        message.success("Đã xóa");
-                        await reloadSections();
-                      } catch (err) {
-                        message.error("Xóa thất bại");
-                      }
-                    }}
-                  >
-                    Xóa
-                  </Button>
-                </div>
-              </div>
+              ))}
             </div>
           )}
         </div>
