@@ -938,6 +938,8 @@ function CVPage() {
 
   const latestCertificate = pickLatestByStartDate(certificates);
 
+  const latestAward = pickLatestByStartDate(awards);
+
   const awardsSorted = Array.isArray(awards)
     ? [...awards].sort((a, b) => {
         const aStart = a.started_at || a.startDate;
