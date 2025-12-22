@@ -146,6 +146,8 @@ function InlineArea({ value, placeholder, onChange, className, rows = 2 }) {
 function CVPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const userType = getCookie("userType");
   const printAreaRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [candidate, setCandidate] = useState(null);
@@ -730,6 +732,12 @@ function CVPage() {
         return;
       }
 
+      if (userType && userType !== "candidate") {
+        message.warning("Chỉ tài khoản ứng viên mới sử dụng trang CV");
+        navigate("/");
+        return;
+      }
+
       try {
         setLoading(true);
 
@@ -811,9 +819,8 @@ function CVPage() {
         setLoading(false);
       }
     };
-
     loadData();
-  }, [navigate]);
+  }, [navigate, userType]);
 
   useEffect(() => {
     if (draft) return;
@@ -917,6 +924,8 @@ function CVPage() {
         return bDate - aDate;
       })
     : [];
+
+  const latestProject = projectsSorted.length > 0 ? projectsSorted[0] : null;
 
   const activitiesSorted = Array.isArray(activities)
     ? [...activities].sort((a, b) => {
