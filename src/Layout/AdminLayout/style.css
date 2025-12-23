@@ -37,3 +37,23 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   min-height: calc(100vh - 112px);
 }
+
+ .admin-layout .admin-content .ant-table-wrapper .ant-table-pagination {
+   width: 100% !important;
+   display: flex !important;
+   justify-content: center !important;
+   margin-left: 0 !important;
+   margin-right: 0 !important;
+ }
+
+ .admin-layout .admin-content .ant-table-wrapper .ant-table-pagination.ant-table-pagination-right {
+   justify-content: center !important;
+ }
+
+ .admin-layout .admin-content .ant-table-wrapper .ant-table-pagination.ant-table-pagination-left {
+   justify-content: center !important;
+ }
+
+ .admin-layout .admin-content .ant-table-wrapper .ant-pagination {
+   display: inline-flex !important;
+ }
