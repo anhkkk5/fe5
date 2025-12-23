@@ -267,7 +267,11 @@ function CompaniesManagement() {
         dataSource={filteredCompanies}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 10, position: ["bottomCenter"] }}
+        pagination={{
+          pageSize: 10,
+          position: ["bottomCenter"],
+          style: { display: "flex", justifyContent: "center", width: "100%" },
+        }}
         scroll={{ x: 1200 }}
       />
 

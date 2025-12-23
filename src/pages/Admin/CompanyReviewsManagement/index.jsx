@@ -299,7 +299,15 @@ function CompanyReviewsManagement() {
             <Table
               columns={columns}
               dataSource={(filtered || []).map((x) => ({ ...x, key: x.id }))}
-              pagination={{ pageSize: 10, position: ["bottomCenter"] }}
+              pagination={{
+                pageSize: 10,
+                position: ["bottomCenter"],
+                style: {
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                },
+              }}
               tableLayout="fixed"
               scroll={{ x: 1200 }}
             />
