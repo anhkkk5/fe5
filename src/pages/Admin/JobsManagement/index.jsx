@@ -264,7 +264,7 @@ function JobsManagement() {
         dataSource={filteredJobs}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 10, position: ["bottomCenter"] }}
         scroll={{ x: 1200 }}
       />
 

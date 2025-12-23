@@ -18,3 +18,8 @@
   color: #1f2937;
 }
 
+ .admin-management-container .ant-table-pagination {
+  justify-content: center;
+  margin: 16px 0 0;
+ }
+
