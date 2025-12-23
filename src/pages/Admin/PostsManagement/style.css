@@ -18,9 +18,14 @@
   color: #1f2937;
 }
 
- .admin-management-container .ant-table-wrapper .ant-table-pagination {
-  justify-content: center !important;
-  width: 100%;
-  margin: 16px 0 0;
+ .admin-management-container .ant-table-pagination {
+   width: 100% !important;
+   display: flex !important;
+   justify-content: center !important;
+   margin-top: 24px;
+ }
+
+ .admin-management-container .ant-pagination {
+   display: inline-flex !important;
  }
 

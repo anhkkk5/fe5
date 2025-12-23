@@ -24,8 +24,6 @@ import {
   adminGetReviewDetail,
 } from "../../../services/companyReviews/companyReviewsServices";
 
-import "./style.css";
-
 const { Title, Text } = Typography;
 
 const statusOptions = [
@@ -258,7 +256,7 @@ function CompanyReviewsManagement() {
   ];
 
   return (
-    <div className="admin-management-container">
+    <div>
       <Card>
         <Space style={{ width: "100%", justifyContent: "space-between" }}>
           <Title level={4} style={{ margin: 0 }}>
@@ -299,15 +297,7 @@ function CompanyReviewsManagement() {
             <Table
               columns={columns}
               dataSource={(filtered || []).map((x) => ({ ...x, key: x.id }))}
-              pagination={{
-                pageSize: 10,
-                position: ["bottomCenter"],
-                style: {
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                },
-              }}
+              pagination={{ pageSize: 10 }}
               tableLayout="fixed"
               scroll={{ x: 1200 }}
             />

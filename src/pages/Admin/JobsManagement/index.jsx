@@ -264,13 +264,8 @@ function JobsManagement() {
         dataSource={filteredJobs}
         rowKey="id"
         loading={loading}
-        pagination={{
-          pageSize: 10,
-          position: ["bottomCenter"],
-          style: { textAlign: "center", display: "block" },
-        }}
+        pagination={{ pageSize: 10, showSizeChanger: false, position: ["bottomCenter"] }}
         scroll={{ x: 1200 }}
-        className="jobs-table"
       />
 
       <Modal

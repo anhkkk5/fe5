@@ -30,13 +30,6 @@
   color: #dc2626;
 }
 
- .admin-layout .ant-table-wrapper .ant-table-pagination,
- .admin-layout .ant-table-wrapper .ant-table-pagination.ant-table-pagination-right,
- .admin-layout .ant-table-wrapper .ant-pagination {
-  justify-content: center !important;
-  width: 100%;
- }
-
 .admin-content {
   background: #fff;
   padding: 24px;

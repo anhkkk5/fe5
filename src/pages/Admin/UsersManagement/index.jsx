@@ -266,11 +266,7 @@ function UsersManagement() {
         dataSource={filteredUsers}
         rowKey="id"
         loading={loading}
-        pagination={{
-          pageSize: 10,
-          position: ["bottomCenter"],
-          style: { display: "flex", justifyContent: "center", width: "100%" },
-        }}
+        pagination={{ pageSize: 10, showSizeChanger: false, position: ["bottomCenter"] }}
         scroll={{ x: 1200 }}
       />
 
