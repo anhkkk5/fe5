@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, Col, Input, List, Row, Spin, Tabs, Typography, message } from "antd";
+import { Avatar, Button, Card, Col, Input, List, Row, Spin, Tabs, Typography, message } from "antd";
 import { getCookie } from "../../helpers/cookie";
 import { decodeJwt } from "../../services/auth/authServices";
 import { getAllUsers } from "../../services/users/usersServices";
@@ -9,7 +9,7 @@ import {
   getOrCreateConversationWith,
   sendChatMessage,
 } from "../../services/chat/chatServices";
-import { connectSocket } from "../../realtime/socketClient";
+import { connectSocket, getSocket } from "../../realtime/socketClient";
 
 const { Title, Text } = Typography;
 
@@ -24,6 +24,10 @@ function ChatPage() {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const listRef = useRef(null);
+  const typingTimerRef = useRef(null);
+
+  const [typingState, setTypingState] = useState({});
+  const [seenState, setSeenState] = useState({});
 
   const userType = getCookie("userType");
 
@@ -45,6 +49,29 @@ function ChatPage() {
     if (myUserId && u1id === myUserId) return u2;
     if (myUserId && u2id === myUserId) return u1;
     return u2;
+  };
+
+  const usersById = useMemo(() => {
+    const m = new Map();
+    (Array.isArray(users) ? users : []).forEach((u) => {
+      if (u?.id != null) m.set(String(u.id), u);
+    });
+    return m;
+  }, [users]);
+
+  const getUserMeta = (u) => {
+    if (!u) return { name: "Người dùng", avatarUrl: null };
+    const id = u?.id != null ? String(u.id) : "";
+    const fromList = id ? usersById.get(id) : null;
+    const name =
+      fromList?.fullName ||
+      fromList?.name ||
+      u?.fullName ||
+      u?.name ||
+      u?.email ||
+      "Người dùng";
+    const avatarUrl = fromList?.avatarUrl || u?.avatarUrl || null;
+    return { name, avatarUrl };
   };
 
   const scrollToBottom = () => {
@@ -151,6 +178,49 @@ function ChatPage() {
     };
   }, [activeConversation?.id]);
 
+  useEffect(() => {
+    const onTyping = (evt) => {
+      const payload = evt?.detail;
+      if (!payload) return;
+      const convId = payload?.conversationId != null ? String(payload.conversationId) : "";
+      if (!convId) return;
+      setTypingState((prev) => ({
+        ...(prev || {}),
+        [convId]: {
+          fromUserId: payload?.fromUserId != null ? String(payload.fromUserId) : "",
+          isTyping: !!payload?.isTyping,
+        },
+      }));
+    };
+
+    const onSeen = (evt) => {
+      const payload = evt?.detail;
+      if (!payload) return;
+      const convId = payload?.conversationId != null ? String(payload.conversationId) : "";
+      if (!convId) return;
+      setSeenState((prev) => ({
+        ...(prev || {}),
+        [convId]: {
+          byUserId: payload?.byUserId != null ? String(payload.byUserId) : "",
+          lastMessageId: payload?.lastMessageId ?? null,
+          seenAt: payload?.seenAt || new Date().toISOString(),
+        },
+      }));
+    };
+
+    try {
+      window.addEventListener("chat:typing", onTyping);
+      window.addEventListener("chat:seen", onSeen);
+    } catch (_e) {}
+
+    return () => {
+      try {
+        window.removeEventListener("chat:typing", onTyping);
+        window.removeEventListener("chat:seen", onSeen);
+      } catch (_e) {}
+    };
+  }, []);
+
   const filteredUsers = useMemo(() => {
     const q = (searchUser || "").toLowerCase().trim();
     if (!q) return users;
@@ -195,6 +265,17 @@ function ChatPage() {
       setSending(true);
       const sent = await sendChatMessage(activeConversation.id, content);
       setText("");
+      try {
+        const s = getSocket();
+        const other = otherUserFromConversation(activeConversation);
+        if (s && other?.id != null) {
+          s.emit("chat:typing", {
+            conversationId: activeConversation.id,
+            toUserId: other.id,
+            isTyping: false,
+          });
+        }
+      } catch (_e) {}
       if (sent) {
         setMessagesList((prev) => [...(Array.isArray(prev) ? prev : []), sent]);
         setTimeout(scrollToBottom, 0);
@@ -218,6 +299,30 @@ function ChatPage() {
   };
 
   const activeOther = otherUserFromConversation(activeConversation);
+  const activeOtherMeta = getUserMeta(activeOther);
+  const activeConvId = activeConversation?.id != null ? String(activeConversation.id) : "";
+  const isOtherTyping =
+    activeConvId &&
+    typingState?.[activeConvId]?.isTyping &&
+    String(typingState?.[activeConvId]?.fromUserId || "") === String(activeOther?.id || "");
+
+  useEffect(() => {
+    if (!activeConversation?.id) return;
+    const other = otherUserFromConversation(activeConversation);
+    if (!other?.id) return;
+    const last = (Array.isArray(messagesList) ? messagesList : []).slice(-1)[0];
+    const lastId = last?.id;
+    try {
+      const s = getSocket();
+      if (s) {
+        s.emit("chat:seen", {
+          conversationId: activeConversation.id,
+          toUserId: other.id,
+          lastMessageId: lastId ?? null,
+        });
+      }
+    } catch (_e) {}
+  }, [activeConversation?.id, loadingMessages]);
 
   if (loading) {
     return (
@@ -246,6 +351,7 @@ function ChatPage() {
                       dataSource={Array.isArray(conversations) ? conversations : []}
                       renderItem={(c) => {
                         const other = otherUserFromConversation(c);
+                        const otherMeta = getUserMeta(other);
                         const isActive = String(c?.id) === String(activeConversation?.id);
                         return (
                           <List.Item
@@ -257,15 +363,20 @@ function ChatPage() {
                             }}
                             onClick={() => setActiveConversation(c)}
                           >
-                            <div style={{ width: "100%" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <Text strong>{other?.fullName || other?.name || other?.email || "Người dùng"}</Text>
-                              </div>
+                            <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
+                              <Avatar src={otherMeta.avatarUrl} size={40}>
+                                {(otherMeta.name || "U").slice(0, 1).toUpperCase()}
+                              </Avatar>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <Text strong ellipsis>{otherMeta.name}</Text>
+                                </div>
                               {c?.lastMessage?.content ? (
                                 <Text type="secondary" style={{ fontSize: 12 }}>
                                   {c.lastMessage.content}
                                 </Text>
                               ) : null}
+                              </div>
                             </div>
                           </List.Item>
                         );
@@ -291,12 +402,17 @@ function ChatPage() {
                             style={{ cursor: "pointer", padding: "10px 8px" }}
                             onClick={() => startChatWith(u.id)}
                           >
-                            <div style={{ width: "100%" }}>
-                              <Text strong>{u?.fullName || u?.name || u?.email || "Người dùng"}</Text>
-                              <div>
-                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                  {u?.email || ""}
-                                </Text>
+                            <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
+                              <Avatar src={u?.avatarUrl} size={40}>
+                                {(u?.fullName || u?.name || "U").slice(0, 1).toUpperCase()}
+                              </Avatar>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <Text strong ellipsis>{u?.fullName || u?.name || u?.email || "Người dùng"}</Text>
+                                <div>
+                                  <Text type="secondary" style={{ fontSize: 12 }}>
+                                    {u?.email || ""}
+                                  </Text>
+                                </div>
                               </div>
                             </div>
                           </List.Item>
@@ -312,10 +428,20 @@ function ChatPage() {
 
         <Col xs={24} md={16} lg={17}>
           <Card bodyStyle={{ padding: 12, height: "calc(100vh - 160px)", display: "flex", flexDirection: "column" }}>
-            <div style={{ padding: "4px 4px 10px 4px", borderBottom: "1px solid #f0f0f0" }}>
-              <Text strong>
-                {activeOther?.fullName || activeOther?.name || activeOther?.email || "Chọn một cuộc trò chuyện"}
-              </Text>
+            <div style={{ padding: "6px 6px 12px 6px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: 10 }}>
+              <Avatar src={activeOtherMeta.avatarUrl} size={42}>
+                {(activeOtherMeta.name || "U").slice(0, 1).toUpperCase()}
+              </Avatar>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Text strong>
+                  {activeOtherMeta.name || "Chọn một cuộc trò chuyện"}
+                </Text>
+                {isOtherTyping ? (
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    đang nhập...
+                  </Text>
+                ) : null}
+              </div>
             </div>
 
             <div
@@ -331,15 +457,23 @@ function ChatPage() {
               {(Array.isArray(messagesList) ? messagesList : []).map((m) => {
                 const senderId = m?.sender?.id != null ? String(m.sender.id) : m?.senderId != null ? String(m.senderId) : "";
                 const mine = myUserId && senderId && String(senderId) === String(myUserId);
+                const showAvatar = !mine;
                 return (
                   <div
                     key={m?.id || `${m?.created_at || m?.createdAt}-${Math.random()}`}
                     style={{
                       display: "flex",
                       justifyContent: mine ? "flex-end" : "flex-start",
+                      alignItems: "flex-end",
                       marginBottom: 8,
+                      gap: 8,
                     }}
                   >
+                    {showAvatar ? (
+                      <Avatar src={activeOtherMeta.avatarUrl} size={28}>
+                        {(activeOtherMeta.name || "U").slice(0, 1).toUpperCase()}
+                      </Avatar>
+                    ) : null}
                     <div
                       style={{
                         maxWidth: "75%",
@@ -356,12 +490,56 @@ function ChatPage() {
                   </div>
                 );
               })}
+
+              {(() => {
+                const convId = activeConversation?.id != null ? String(activeConversation.id) : "";
+                const s = convId ? seenState?.[convId] : null;
+                const last = (Array.isArray(messagesList) ? messagesList : []).slice(-1)[0];
+                const senderId = last?.sender?.id != null ? String(last.sender.id) : last?.senderId != null ? String(last.senderId) : "";
+                const mine = myUserId && senderId && String(senderId) === String(myUserId);
+                const isSeenByOther =
+                  mine &&
+                  s &&
+                  String(s?.byUserId || "") === String(activeOther?.id || "") &&
+                  (s?.lastMessageId == null || String(s?.lastMessageId) === String(last?.id));
+                if (!isSeenByOther) return null;
+                return (
+                  <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: 4 }}>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Đã xem
+                    </Text>
+                  </div>
+                );
+              })()}
             </div>
 
             <div style={{ display: "flex", gap: 8, paddingTop: 10 }}>
               <Input.TextArea
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setText(v);
+                  try {
+                    const s = getSocket();
+                    const other = otherUserFromConversation(activeConversation);
+                    if (!s || !activeConversation?.id || !other?.id) return;
+                    s.emit("chat:typing", {
+                      conversationId: activeConversation.id,
+                      toUserId: other.id,
+                      isTyping: !!v,
+                    });
+                    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+                    typingTimerRef.current = setTimeout(() => {
+                      try {
+                        s.emit("chat:typing", {
+                          conversationId: activeConversation.id,
+                          toUserId: other.id,
+                          isTyping: false,
+                        });
+                      } catch (_e) {}
+                    }, 900);
+                  } catch (_e) {}
+                }}
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 placeholder="Nhập tin nhắn..."
                 onPressEnter={(e) => {

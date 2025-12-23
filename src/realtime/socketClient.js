@@ -44,6 +44,18 @@ export const connectSocket = () => {
       } catch (_e) {}
     });
 
+    socket.on("chat:typing", (payload) => {
+      try {
+        window.dispatchEvent(new CustomEvent("chat:typing", { detail: payload }));
+      } catch (_e) {}
+    });
+
+    socket.on("chat:seen", (payload) => {
+      try {
+        window.dispatchEvent(new CustomEvent("chat:seen", { detail: payload }));
+      } catch (_e) {}
+    });
+
     return socket;
   } catch (_e) {
     return null;

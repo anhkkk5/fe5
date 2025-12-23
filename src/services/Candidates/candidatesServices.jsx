@@ -129,6 +129,13 @@ export const uploadMyAvatar = async (file) => {
   }
 };
 
+export const uploadMyAvatarViaApi = async (file) => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+  const result = await editForm("candidates/me/avatar", formData);
+  return result;
+};
+
 export const deleteMyAvatar = async () => {
   try {
     // Lấy thông tin candidate hiện tại để lấy publicId của ảnh cũ

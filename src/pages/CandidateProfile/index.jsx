@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Typography, Tag, Spin, message, Button, Divider } from "antd";
+import { Card, Row, Col, Typography, Tag, Spin, message, Button, Divider, Upload } from "antd";
 import { MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
-import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
+import { getMyCandidateProfile, uploadMyAvatarViaApi } from "../../services/Candidates/candidatesServices";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -11,6 +11,7 @@ function CandidateProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const token = getCookie("token") || localStorage.getItem("token");
@@ -31,6 +32,28 @@ function CandidateProfile() {
     };
     fetchMe();
   }, [navigate]);
+
+  const onUploadAvatar = async (file) => {
+    try {
+      setUploading(true);
+      await uploadMyAvatarViaApi(file);
+      const me = await getMyCandidateProfile();
+      setData(me || {});
+      message.success("Cập nhật avatar thành công");
+    } catch (e) {
+      const backendMsg = e?.response?.data?.message;
+      message.error(
+        backendMsg
+          ? Array.isArray(backendMsg)
+            ? backendMsg.join(", ")
+            : backendMsg
+          : "Cập nhật avatar thất bại",
+      );
+    } finally {
+      setUploading(false);
+    }
+    return false;
+  };
 
   if (loading) {
     return (
@@ -58,8 +81,26 @@ function CandidateProfile() {
                 overflow: "hidden",
                 border: "1px solid #eee",
               }}>
-                <UserOutlined style={{ fontSize: 56, color: "#8c8c8c" }} />
+                {data?.avatarUrl ? (
+                  <img
+                    src={data.avatarUrl}
+                    alt="avatar"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <UserOutlined style={{ fontSize: 56, color: "#8c8c8c" }} />
+                )}
               </div>
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                beforeUpload={onUploadAvatar}
+                disabled={uploading}
+              >
+                <Button loading={uploading} size="small">
+                  Đổi avatar
+                </Button>
+              </Upload>
               <Title level={4} style={{ marginBottom: 4 }}>{data?.fullName || "Chưa cập nhật"}</Title>
               <Text type="secondary">{data?.title || "Ứng viên"}</Text>
               <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
