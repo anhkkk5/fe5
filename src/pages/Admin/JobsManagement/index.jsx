@@ -267,8 +267,10 @@ function JobsManagement() {
         pagination={{
           pageSize: 10,
           position: ["bottomCenter"],
+          style: { textAlign: "center", display: "block" },
         }}
         scroll={{ x: 1200 }}
+        className="jobs-table"
       />
 
       <Modal

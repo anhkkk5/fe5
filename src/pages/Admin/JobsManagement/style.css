@@ -19,8 +19,29 @@
 }
 
 /* Fix pagination to center bottom */
-.admin-management-container .ant-table-wrapper .ant-table-pagination {
+.admin-management-container .ant-pagination {
   display: flex !important;
   justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
   margin-top: 16px !important;
+}
+
+.admin-management-container .ant-table-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.admin-management-container .ant-table-pagination.ant-pagination {
+  justify-content: center !important;
+}
+
+.jobs-table .ant-table-pagination {
+  text-align: center !important;
+}
+
+.jobs-table .ant-pagination {
+  display: inline-block !important;
+  margin: 16px auto !important;
 }
