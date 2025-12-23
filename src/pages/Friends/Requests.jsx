@@ -49,6 +49,11 @@ function FriendRequestsPage() {
       message.warning("Vui lòng đăng nhập để xem lời mời kết bạn");
       return;
     }
+    if (userType !== "candidate") {
+      message.warning("Chỉ ứng viên mới sử dụng tính năng bạn bè");
+      navigate("/");
+      return;
+    }
     load();
   }, []);
 

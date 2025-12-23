@@ -371,16 +371,20 @@ function Header() {
       label: "Thông tin cá nhân",
       onClick: () => navigate("/profile"),
     },
-    {
-      key: "friends",
-      label: "Bạn bè",
-      onClick: () => navigate("/friends"),
-    },
-    {
-      key: "chat",
-      label: "Chat",
-      onClick: () => navigate("/chat"),
-    },
+    ...(userType === "candidate"
+      ? [
+          {
+            key: "friends",
+            label: "Bạn bè",
+            onClick: () => navigate("/friends"),
+          },
+          {
+            key: "chat",
+            label: "Chat",
+            onClick: () => navigate("/chat"),
+          },
+        ]
+      : []),
     {
       key: "logout",
       label: "Đăng xuất",

@@ -25,6 +25,8 @@ function ChatPage() {
   const [sending, setSending] = useState(false);
   const listRef = useRef(null);
 
+  const userType = getCookie("userType");
+
   const myUserId = useMemo(() => {
     const cookieId = getCookie("id");
     if (cookieId) return String(cookieId);
@@ -65,7 +67,11 @@ function ChatPage() {
       const userList = usersData.status === "fulfilled" && Array.isArray(usersData.value) ? usersData.value : [];
 
       setConversations(convList);
-      setUsers(userList.filter((u) => String(u?.id || "") !== String(myUserId || "")));
+      setUsers(
+        userList
+          .filter((u) => u?.role === "candidate")
+          .filter((u) => String(u?.id || "") !== String(myUserId || "")),
+      );
 
       if (!activeConversation && convList.length > 0) {
         setActiveConversation(convList[0]);
@@ -93,6 +99,14 @@ function ChatPage() {
   };
 
   useEffect(() => {
+    if (!userType) {
+      message.warning("Vui lòng đăng nhập để chat");
+      return;
+    }
+    if (userType !== "candidate") {
+      message.warning("Chỉ ứng viên mới sử dụng tính năng chat");
+      return;
+    }
     connectSocket();
     loadConversationsAndUsers();
   }, []);
@@ -159,7 +173,14 @@ function ChatPage() {
       setActiveConversation(conv);
     } catch (e) {
       if (e?.response?.status === 403) {
-        message.error("Bạn cần kết bạn trước khi chat");
+        const backendMsg = e?.response?.data?.message;
+        message.error(
+          backendMsg
+            ? Array.isArray(backendMsg)
+              ? backendMsg.join(", ")
+              : backendMsg
+            : "Cần nâng cấp Prime để chat với người lạ",
+        );
         return;
       }
       message.error("Không thể bắt đầu chat");
@@ -180,7 +201,14 @@ function ChatPage() {
       }
     } catch (e) {
       if (e?.response?.status === 403) {
-        message.error("Bạn cần kết bạn trước khi chat");
+        const backendMsg = e?.response?.data?.message;
+        message.error(
+          backendMsg
+            ? Array.isArray(backendMsg)
+              ? backendMsg.join(", ")
+              : backendMsg
+            : "Cần nâng cấp Prime để chat với người lạ",
+        );
         return;
       }
       message.error("Gửi tin nhắn thất bại");

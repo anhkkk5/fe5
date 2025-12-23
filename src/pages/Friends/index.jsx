@@ -41,6 +41,11 @@ function FriendsPage() {
       message.warning("Vui lòng đăng nhập để xem bạn bè");
       return;
     }
+    if (userType !== "candidate") {
+      message.warning("Chỉ ứng viên mới sử dụng tính năng bạn bè");
+      navigate("/");
+      return;
+    }
     load();
   }, []);
 
@@ -55,10 +60,10 @@ function FriendsPage() {
 
   const filteredUsers = useMemo(() => {
     const text = (q || "").trim().toLowerCase();
-    const list = Array.isArray(users) ? users : [];
+    const list = (Array.isArray(users) ? users : []).filter((u) => u?.role === "candidate");
     if (!text) return list;
     return list.filter((u) => {
-      const name = (u?.name || "").toLowerCase();
+      const name = (u?.fullName || u?.name || "").toLowerCase();
       const email = (u?.email || "").toLowerCase();
       return name.includes(text) || email.includes(text);
     });
