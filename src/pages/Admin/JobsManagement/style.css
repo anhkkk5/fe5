@@ -18,8 +18,9 @@
   color: #1f2937;
 }
 
- .admin-management-container .ant-table-wrapper .ant-table-pagination {
+/* Fix pagination to center bottom */
+.admin-management-container .ant-table-wrapper .ant-table-pagination {
+  display: flex !important;
   justify-content: center !important;
-  width: 100%;
-  margin: 16px 0 0;
- }
+  margin-top: 16px !important;
+}
