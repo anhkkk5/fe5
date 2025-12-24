@@ -153,8 +153,8 @@
 .job-overview-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: none;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.06);
   position: sticky;
   top: 24px;
 }
@@ -163,9 +163,52 @@
   padding: 0;
 }
 
+/* Sidebar primary actions */
+.job-sidebar-btn {
+  width: 100%;
+  margin: 16px 16px 0 16px;
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: none;
+}
+
+.job-sidebar-btn--primary {
+  background: linear-gradient(135deg, #c41e3a 0%, #e11d48 100%);
+  border: none;
+}
+
+.job-sidebar-btn--primary:hover,
+.job-sidebar-btn--primary:focus {
+  background: linear-gradient(135deg, #b91c1c 0%, #e11d48 100%);
+}
+
+.job-sidebar-btn--success {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  border: none;
+}
+
+.job-sidebar-btn--success:hover,
+.job-sidebar-btn--success:focus {
+  background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+}
+
+.job-sidebar-btn--ghost {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+}
+
+.job-sidebar-btn--ghost:hover,
+.job-sidebar-btn--ghost:focus {
+  border-color: rgba(15, 23, 42, 0.18);
+  background: #f8fafc;
+}
+
 /* Salary Section */
 .salary-section {
-  padding: 24px;
+  padding: 18px 16px;
   border-bottom: 1px solid #e8e8e8;
 }
 
@@ -194,16 +237,23 @@
 
 /* Location Section */
 .location-section {
-  padding: 24px;
+  padding: 18px 16px;
   border-bottom: 1px solid #e8e8e8;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.location-section::before {
-  content: "📍";
-  font-size: 24px;
+.job-location-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(196, 30, 58, 0.08);
+  color: #c41e3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
 }
 
 .location-info {
@@ -228,7 +278,7 @@
 
 /* Overview Section */
 .overview-section {
-  padding: 24px;
+  padding: 18px 16px;
   border-bottom: 1px solid #e8e8e8;
 }
 
@@ -244,13 +294,17 @@
 .overview-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 12px;
 }
 
 .overview-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: #ffffff;
 }
 
 .overview-item-label {
@@ -265,7 +319,7 @@
 }
 
 .overview-icon {
-  color: #c1440e;
+  color: #c41e3a;
   font-size: 16px;
   width: 16px;
   text-align: center;
@@ -275,12 +329,12 @@
   font-size: 15px;
   color: #2c3e50;
   font-weight: 500;
-  margin-left: 24px;
+  margin-left: 0;
 }
 
 /* Share Section */
 .share-section {
-  padding: 24px;
+  padding: 18px 16px;
 }
 
 .share-section h4 {
@@ -299,9 +353,9 @@
 }
 
 .copy-link-btn {
-  background: #f5f1ed;
-  border: none;
-  color: #c1440e;
+  background: rgba(196, 30, 58, 0.08);
+  border: 1px solid rgba(196, 30, 58, 0.18);
+  color: #c41e3a;
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -314,9 +368,9 @@
 }
 
 .copy-link-btn:hover {
-  background: #eee7e1;
+  background: rgba(196, 30, 58, 0.12);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(193, 68, 14, 0.15);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.10);
 }
 
 .copy-link-btn i {
@@ -343,23 +397,42 @@
 }
 
 .social-btn.linkedin {
-  background: #a94442;
+  background: rgba(14, 118, 168, 0.12);
+  color: #0e76a8;
+  border: 1px solid rgba(14, 118, 168, 0.18);
+}
+
+.social-btn.linkedin:hover {
+  background: rgba(14, 118, 168, 0.18);
   color: white;
 }
 
 .social-btn.facebook {
-  background: #8b3a3a;
-  color: white;
+  background: rgba(24, 119, 242, 0.12);
+  color: #1877f2;
+  border: 1px solid rgba(24, 119, 242, 0.18);
+}
+
+.social-btn.facebook:hover {
+  background: rgba(24, 119, 242, 0.18);
+  color: #1877f2;
 }
 
 .social-btn.twitter {
-  background: #a94442;
-  color: white;
+  background: rgba(29, 161, 242, 0.12);
+  color: #1da1f2;
+  border: 1px solid rgba(29, 161, 242, 0.18);
+}
+
+.social-btn.twitter:hover {
+  background: rgba(29, 161, 242, 0.18);
+  color: #1da1f2;
 }
 
 .social-btn.email {
-  background: #d9d5d0;
-  color: #999;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.10);
 }
 
 .social-btn:hover {

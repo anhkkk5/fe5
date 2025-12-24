@@ -693,12 +693,7 @@ function JobDetail() {
               <Button
                 type="primary"
                 onClick={showUpdateModal}
-                style={{
-                  width: "100%",
-                  marginBottom: "20px",
-                  backgroundColor: "#c41e3a",
-                  borderColor: "#c41e3a",
-                }}
+                className="job-sidebar-btn job-sidebar-btn--primary"
               >
                 Cập Nhật Thông Tin
               </Button>
@@ -708,10 +703,7 @@ function JobDetail() {
               <Button
                 type="default"
                 onClick={handleFollowJob}
-                style={{
-                  width: "100%",
-                  marginBottom: "20px",
-                }}
+                className="job-sidebar-btn job-sidebar-btn--ghost"
               >
                 {isFollowingJob ? "Đã theo dõi" : "Theo dõi công việc"}
               </Button>
@@ -722,12 +714,7 @@ function JobDetail() {
               <Button
                 type="primary"
                 onClick={hasApplied ? handleFollowCompany : handleApply}
-                style={{
-                  width: "100%",
-                  marginBottom: "20px",
-                  backgroundColor: "#52c41a",
-                  borderColor: "#52c41a",
-                }}
+                className="job-sidebar-btn job-sidebar-btn--success"
               >
                 {hasApplied ? "Theo dõi công ty" : "Ứng tuyển ngay"}
               </Button>
@@ -742,10 +729,15 @@ function JobDetail() {
             </div>
             {/* Location */}
             <div className="location-section">
-              <Text className="location-label">Job Location</Text>
-              <Text className="location-value">
-                {job.location || locationName || "Unknown"}
-              </Text>
+              <div className="job-location-icon" aria-hidden="true">
+                <EnvironmentOutlined />
+              </div>
+              <div className="location-info">
+                <Text className="location-label">Job Location</Text>
+                <Text className="location-value">
+                  {job.location || locationName || "Unknown"}
+                </Text>
+              </div>
             </div>
             {/* Job Overview */}
 
@@ -763,7 +755,29 @@ function JobDetail() {
                       : "N/A"}
                   </div>
                 </div>
-                {/* Tương tự cho các items khác */}
+                <div className="overview-item">
+                  <div className="overview-item-label">
+                    <CalendarOutlined className="overview-icon" />
+                    EXPIRES
+                  </div>
+                  <div className="overview-item-value">
+                    {job.expire_at ? dayjs(job.expire_at).format("DD MMM, YYYY") : "N/A"}
+                  </div>
+                </div>
+                <div className="overview-item">
+                  <div className="overview-item-label">
+                    <ArrowRightOutlined className="overview-icon" />
+                    JOB TYPE
+                  </div>
+                  <div className="overview-item-value">{job.type || job.jobType || "N/A"}</div>
+                </div>
+                <div className="overview-item">
+                  <div className="overview-item-label">
+                    <FileTextOutlined className="overview-icon" />
+                    LEVEL
+                  </div>
+                  <div className="overview-item-value">{job.jobLevel || job.level || "N/A"}</div>
+                </div>
               </div>
             </div>
             {/* Share */}

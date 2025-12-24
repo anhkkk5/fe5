@@ -90,6 +90,9 @@ import MarketTrends from "../pages/CareerGuide/MarketTrends.jsx";
 import PostsList from "../pages/Posts/index.jsx";
 import PostDetail from "../pages/Posts/PostDetail.jsx";
 
+/* Feed */
+import FeedPage from "../pages/Feed/index.jsx";
+
 /* Admin */
 import AdminDashboard from "../pages/Admin/Dashboard/index.jsx";
 import JobsManagement from "../pages/Admin/JobsManagement/index.jsx";
@@ -186,6 +189,8 @@ export const routes = [
 
       { path: "posts", element: <PostsList /> },
       { path: "posts/:slug", element: <PostDetail /> },
+
+      { path: "feed", element: <FeedPage /> },
 
       { path: "wallet/topup", element: <WalletTopup /> },
       { path: "momo/return", element: <MomoReturn /> },

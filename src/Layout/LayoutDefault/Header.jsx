@@ -620,6 +620,15 @@ function Header() {
                   Trang chủ
                 </NavLink>
 
+                <NavLink
+                  to="/feed"
+                  className={`header__top-link ${
+                    location.pathname.startsWith("/feed") ? "header__top-link--active" : ""
+                  }`}
+                >
+                  Bản tin
+                </NavLink>
+
                 {/* JOB MENU */}
                 <div
                   className={`header__job-menu ${isJobMenuOpen ? "header__job-menu--open" : ""}`}

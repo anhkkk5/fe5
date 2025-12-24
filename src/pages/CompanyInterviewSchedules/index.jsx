@@ -147,8 +147,30 @@ function CompanyInterviewSchedules() {
     setCurrentPage(1);
   }, [schedules.length]);
 
+  const scheduledApplicationIds = useMemo(() => {
+    const set = new Set();
+    (Array.isArray(schedules) ? schedules : []).forEach((s) => {
+      if (!s) return;
+      // If a schedule exists (not cancelled), we consider this application already scheduled
+      if (String(s.status || "") === "cancelled") return;
+      const id = s.applicationId ?? s.application?.id ?? s.application_id;
+      if (id !== null && typeof id !== "undefined") {
+        set.add(String(id));
+      }
+    });
+    return set;
+  }, [schedules]);
+
+  const availableApprovedApps = useMemo(() => {
+    return (Array.isArray(approvedApps) ? approvedApps : []).filter((a) => {
+      const id = a?.id;
+      if (id === null || typeof id === "undefined") return false;
+      return !scheduledApplicationIds.has(String(id));
+    });
+  }, [approvedApps, scheduledApplicationIds]);
+
   const appOptions = useMemo(() => {
-    return approvedApps.map((a) => {
+    return availableApprovedApps.map((a) => {
       const candidateName = a.candidate?.fullName || a.candidate?.user?.name || "Ứng viên";
       const jobTitle = a.job?.title || "Công việc";
       return {
@@ -156,7 +178,7 @@ function CompanyInterviewSchedules() {
         value: a.id,
       };
     });
-  }, [approvedApps]);
+  }, [availableApprovedApps]);
 
   const onCreate = async (values) => {
     try {
@@ -382,7 +404,13 @@ function CompanyInterviewSchedules() {
           </Title>
           <Space>
             <Button onClick={load}>Tải lại</Button>
-            <Button type="primary" onClick={() => setCreateOpen(true)}>
+            <Button
+              type="primary"
+              onClick={() => {
+                createForm.resetFields();
+                setCreateOpen(true);
+              }}
+            >
               Tạo lịch
             </Button>
           </Space>
@@ -428,6 +456,12 @@ function CompanyInterviewSchedules() {
               options={appOptions}
             />
           </Form.Item>
+
+          <div style={{ marginTop: -12, marginBottom: 12 }}>
+            <Text type="secondary">
+              Các ứng viên đã có lịch phỏng vấn sẽ được ẩn để tránh tạo lịch trùng.
+            </Text>
+          </div>
 
           <Form.Item label="Vòng" name="round" initialValue={1}>
             <Input type="number" min={1} max={20} />

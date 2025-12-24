@@ -467,12 +467,6 @@ function CompanyDetail() {
                             <div className="related-company-name">
                               {relatedCompany.fullName}
                             </div>
-                            <Tag
-                              color="red-inverse"
-                              className="related-company-tag"
-                            >
-                              Featured
-                            </Tag>
                           </div>
                         </div>
                         <div className="related-company-location">
