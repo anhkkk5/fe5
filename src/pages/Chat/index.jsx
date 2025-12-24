@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Button, Card, Col, Input, List, Row, Spin, Tabs, Typography, message } from "antd";
+import { useSearchParams } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import { decodeJwt } from "../../services/auth/authServices";
 import { getAllUsers } from "../../services/users/usersServices";
@@ -27,6 +28,7 @@ const getUserDisplayName = (u) => {
 };
 
 function ChatPage() {
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
   const [users, setUsers] = useState([]);
@@ -46,6 +48,11 @@ function ChatPage() {
     const payload = token ? decodeJwt(token) : null;
     return payload?.sub ? String(payload.sub) : payload?.id ? String(payload.id) : "";
   }, []);
+
+  const initialConversationId = useMemo(() => {
+    const id = searchParams?.get("conversationId");
+    return id ? String(id) : "";
+  }, [searchParams]);
 
   const allUsersById = useMemo(() => {
     const map = new Map();
@@ -103,6 +110,16 @@ function ChatPage() {
             String(u?.role || "").toLowerCase() === "candidate",
         ),
       );
+
+      if (initialConversationId) {
+        const found = convList.find((c) => String(c?.id || "") === String(initialConversationId));
+        if (found) {
+          setActiveConversation(found);
+          return;
+        }
+        setActiveConversation({ id: Number(initialConversationId) });
+        return;
+      }
 
       if (!activeConversation && convList.length > 0) {
         setActiveConversation(convList[0]);
