@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import {
   BellOutlined,
+  EllipsisOutlined,
   BookOutlined,
   CrownOutlined,
   FileTextOutlined,
@@ -38,12 +39,12 @@ import {
   BarChartOutlined,
 } from "@ant-design/icons";
 
-import { Badge, Dropdown, Menu, Spin } from "antd";
+import { Badge, Dropdown, Spin } from "antd";
 
 import { getAllCompany, getMyCompany, updateMyCompany } from "../../services/getAllCompany/companyServices";
 import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
 import { decodeJwt } from "../../services/auth/authServices";
-import { getMyNotifications, markNotificationRead } from "../../services/notifications/notificationsServices";
+import { deleteNotification, getMyNotifications, markNotificationRead } from "../../services/notifications/notificationsServices";
 import { connectSocket, disconnectSocket } from "../../realtime/socketClient";
 import logoImage from "../../assets/logologin.png";
 
@@ -58,6 +59,7 @@ function Header() {
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifItems, setNotifItems] = useState([]);
   const [notifTab, setNotifTab] = useState("all");
+  const [notifActionOpenId, setNotifActionOpenId] = useState(null);
   const [companyId, setCompanyId] = useState("");
   const [companies, setCompanies] = useState([]);
   const [isJobMenuOpen, setIsJobMenuOpen] = useState(false);
@@ -107,6 +109,36 @@ function Header() {
       return;
     }
     navigate("/notifications");
+  };
+
+  const handleNotifAction = async (key, n) => {
+    if (!n?.id) return;
+    if (key === "mark_read") {
+      try {
+        if (!n?.read) {
+          await markNotificationRead(n.id);
+          setNotifItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: 1 } : x)));
+          setUnreadNotifications((prev) => Math.max(0, (Number(prev) || 0) - 1));
+        }
+      } catch (_e) {
+      } finally {
+        setNotifActionOpenId(null);
+      }
+      return;
+    }
+
+    if (key === "delete") {
+      try {
+        await deleteNotification(n.id);
+        setNotifItems((prev) => prev.filter((x) => x.id !== n.id));
+        if (!n?.read) {
+          setUnreadNotifications((prev) => Math.max(0, (Number(prev) || 0) - 1));
+        }
+      } catch (_e) {
+      } finally {
+        setNotifActionOpenId(null);
+      }
+    }
   };
 
   const notifList = (notifTab === "unread" ? notifItems.filter((n) => !n?.read) : notifItems).slice(0, 8);
@@ -178,7 +210,39 @@ function Header() {
                 </div>
                 <div className="header__notif-item-message">{n.message || ""}</div>
               </div>
-              {!n?.read ? <div className="header__notif-dot" /> : null}
+              <div className="header__notif-item-actions" onClick={(e) => e.stopPropagation()}>
+                <Dropdown
+                  trigger={["click"]}
+                  open={notifActionOpenId === n.id}
+                  onOpenChange={(open) => setNotifActionOpenId(open ? n.id : null)}
+                  getPopupContainer={(triggerNode) => triggerNode?.closest?.(".header__notif-panel") || document.body}
+                  menu={{
+                    items: [
+                      {
+                        key: "mark_read",
+                        label: "Đánh dấu là đã đọc",
+                        disabled: !!n?.read,
+                      },
+                      {
+                        key: "delete",
+                        label: "Xóa thông báo này",
+                        danger: true,
+                      },
+                    ],
+                    onClick: ({ key }) => handleNotifAction(key, n),
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="header__notif-item-more"
+                    aria-label="Tùy chọn thông báo"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <EllipsisOutlined />
+                  </button>
+                </Dropdown>
+                {!n?.read ? <div className="header__notif-dot" /> : null}
+              </div>
             </div>
           ))
         )}
@@ -211,7 +275,6 @@ function Header() {
     { key: "tax", icon: <CalculatorOutlined />, label: "Tính thuế thu nhập cá nhân", path: "/personal-income-tax" },
     { key: "compound", icon: <LineChartOutlined />, label: "Tính lãi suất kép", path: "/compound-interest" },
     { key: "unemployment", icon: <SafetyCertificateOutlined />, label: "Tính bảo hiểm thất nghiệp", path: "/unemployment-insurance" },
-    { key: "company-reviews", icon: <ShopOutlined />, label: "Review công ty", path: "/company-reviews" },
     { key: "social", icon: <SolutionOutlined />, label: "Tính bảo hiểm xã hội một lần" },
     { key: "saving-plan", icon: <CalculatorOutlined />, label: "Lập kế hoạch tiết kiệm", path: "/savings-plan" },
     { key: "ads-rent", icon: <MobileOutlined />, label: "Thuê quảng cáo", path: "/ads/rent" },
@@ -571,17 +634,6 @@ function Header() {
                   >
                     Việc làm
                   </NavLink>
-
-                  {isLoggedIn && (
-                    <NavLink
-                      to="/company-reviews"
-                      className={`header__top-link ${
-                        location.pathname.startsWith("/company-reviews") ? "header__top-link--active" : ""
-                      }`}
-                    >
-                      Review công ty
-                    </NavLink>
-                  )}
 
                   <div className="header__job-dropdown">
                     <div className="header__job-dropdown-left">

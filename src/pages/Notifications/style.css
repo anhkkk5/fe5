@@ -1,12 +1,211 @@
 .notifications-page {
   min-height: 100vh;
   padding: 24px 16px 40px;
-  background: #ffffff;
+  background: #f3f4f6;
 }
 
 .notifications-shell {
   max-width: 900px;
   margin: 0 auto;
+}
+
+.notifications-center {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.notifications-center__card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.10);
+  overflow: hidden;
+}
+
+.notifications-center__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 12px;
+}
+
+.notifications-center__title {
+  margin: 0 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.6px;
+  color: #111827 !important;
+}
+
+.notifications-center__date {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.notifications-center__header-more {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-center__header-more:hover {
+  background: #f3f4f6;
+}
+
+.notifications-center__tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 14px;
+}
+
+.notifications-center__tab {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: #111827;
+  font-weight: 800;
+}
+
+.notifications-center__tab.is-active {
+  background: rgba(22, 119, 255, 0.12);
+  color: #1677ff;
+}
+
+.notifications-center__body {
+  padding: 6px 12px 18px;
+}
+
+.notifications-center__empty {
+  padding: 18px 12px;
+  text-align: center;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.notifications-center__section {
+  padding: 8px 6px;
+}
+
+.notifications-center__section-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #111827;
+  padding: 10px 10px 8px;
+}
+
+.notifications-center__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.notifications-center__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.notifications-center__item:hover {
+  background: #f5f7fb;
+}
+
+.notifications-center__item.is-unread {
+  background: rgba(22, 119, 255, 0.05);
+}
+
+.notifications-center__avatar {
+  flex: 0 0 auto;
+}
+
+.notifications-center__avatar .ant-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 999px !important;
+  background: rgba(22, 119, 255, 0.12) !important;
+  color: #1677ff !important;
+}
+
+.notifications-center__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notifications-center__text {
+  color: #111827;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.notifications-center__sep {
+  margin: 0 8px;
+  color: #9ca3af;
+}
+
+.notifications-center__time {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1677ff;
+}
+
+.notifications-center__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.notifications-center__more {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(1px);
+  transition: opacity 140ms ease, transform 140ms ease, background 140ms ease;
+}
+
+.notifications-center__item:hover .notifications-center__more {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.notifications-center__more:hover {
+  background: #ffffff;
+  color: #111827;
+}
+
+.notifications-center__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #1677ff;
 }
 
 .notifications-hero {
@@ -194,6 +393,19 @@
 @media (max-width: 576px) {
   .notifications-page {
     padding: 16px 12px 28px;
+  }
+
+  .notifications-center__header {
+    padding: 16px 14px 10px;
+  }
+
+  .notifications-center__tabs {
+    padding: 0 14px 12px;
+  }
+
+  .notifications-center__avatar .ant-avatar {
+    width: 46px !important;
+    height: 46px !important;
   }
 
   .notification-top {

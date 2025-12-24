@@ -80,6 +80,8 @@ function CareerGuide() {
                           <img
                             alt={post.title}
                             src={post.thumbnail}
+                            loading="lazy"
+                            decoding="async"
                             className="career-guide__post-thumbnail"
                           />
                         ) : null

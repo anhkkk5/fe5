@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Button, List, Popconfirm, Spin, Tag, Typography, message } from "antd";
-import { BellOutlined, CloseOutlined } from "@ant-design/icons";
+import { Avatar, Dropdown, Spin, Typography, message } from "antd";
+import { BellOutlined, EllipsisOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import "./style.css";
@@ -43,6 +43,8 @@ function NotificationsPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
+  const [tab, setTab] = useState("all");
+  const [actionOpenId, setActionOpenId] = useState(null);
 
   const userType = getCookie("userType");
 
@@ -128,95 +130,225 @@ function NotificationsPage() {
     );
   }
 
+  const visibleItems = tab === "unread" ? items.filter((n) => !n?.read) : items;
+  const now = Date.now();
+  const isNew = (createdAt) => {
+    const dt = new Date(createdAt);
+    if (Number.isNaN(dt.getTime())) return false;
+    return now - dt.getTime() < 24 * 60 * 60 * 1000;
+  };
+
+  const newest = visibleItems.filter((n) => isNew(n?.created_at));
+  const older = visibleItems.filter((n) => !isNew(n?.created_at));
+
+  const handleOpen = async (n) => {
+    try {
+      if (!n?.read) await onMarkRead(n.id);
+    } catch (_e) {}
+    if (n?.link) {
+      navigate(n.link);
+      return;
+    }
+  };
+
   return (
     <div className="notifications-page">
-      <div className="notifications-shell">
-        <div className="notifications-hero">
-          <div className="notifications-date">{formatHeaderDate(new Date())}</div>
-          <div className="notifications-hero-row">
-            <Title level={2} className="notifications-hero-title">
-              Trung tâm thông báo
-            </Title>
-            <Button
-              className="notifications-close"
-              type="text"
-              shape="circle"
-              icon={<CloseOutlined />}
-              onClick={() => navigate(-1)}
-              aria-label="Đóng"
-            />
+      <div className="notifications-center">
+        <div className="notifications-center__card">
+          <div className="notifications-center__header">
+            <div>
+              <Title level={1} className="notifications-center__title">
+                Thông báo
+              </Title>
+              <div className="notifications-center__date">{formatHeaderDate(new Date())}</div>
+            </div>
+
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              getPopupContainer={(triggerNode) => triggerNode?.closest?.(".notifications-center__card") || document.body}
+              menu={{
+                items: [
+                  { key: "reload", label: "Tải lại" },
+                  { key: "close", label: "Đóng" },
+                ],
+                onClick: ({ key }) => {
+                  if (key === "reload") load();
+                  if (key === "close") navigate(-1);
+                },
+              }}
+            >
+              <button type="button" className="notifications-center__header-more" aria-label="Tùy chọn">
+                <EllipsisOutlined />
+              </button>
+            </Dropdown>
           </div>
-          <div className="notifications-hero-actions">
-            <Button className="notifications-reload" onClick={load}>
-              Tải lại
-            </Button>
+
+          <div className="notifications-center__tabs">
+            <button
+              type="button"
+              className={`notifications-center__tab ${tab === "all" ? "is-active" : ""}`}
+              onClick={() => setTab("all")}
+            >
+              Tất cả
+            </button>
+            <button
+              type="button"
+              className={`notifications-center__tab ${tab === "unread" ? "is-active" : ""}`}
+              onClick={() => setTab("unread")}
+            >
+              Chưa đọc
+            </button>
+          </div>
+
+          <div className="notifications-center__body">
+            {visibleItems.length === 0 ? (
+              <div className="notifications-center__empty">Chưa có thông báo</div>
+            ) : (
+              <>
+                {newest.length > 0 ? (
+                  <div className="notifications-center__section">
+                    <div className="notifications-center__section-title">Mới</div>
+                    <div className="notifications-center__list">
+                      {newest.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`notifications-center__item ${n?.read ? "is-read" : "is-unread"}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleOpen(n)}
+                        >
+                          <div className="notifications-center__avatar">
+                            <Avatar icon={<BellOutlined />} />
+                          </div>
+                          <div className="notifications-center__content">
+                            <div className="notifications-center__text">
+                              <Text strong>{n.title || "Thông báo"}</Text>
+                              {n.message ? <span className="notifications-center__sep">·</span> : null}
+                              {n.message ? <span>{n.message}</span> : null}
+                            </div>
+                            <div className="notifications-center__time">{formatRelativeTime(n.created_at)}</div>
+                          </div>
+
+                          <div className="notifications-center__actions" onClick={(e) => e.stopPropagation()}>
+                            <Dropdown
+                              trigger={["click"]}
+                              open={actionOpenId === n.id}
+                              onOpenChange={(open) => setActionOpenId(open ? n.id : null)}
+                              placement="bottomRight"
+                              getPopupContainer={(triggerNode) =>
+                                triggerNode?.closest?.(".notifications-center__card") || document.body
+                              }
+                              menu={{
+                                items: [
+                                  {
+                                    key: "mark_read",
+                                    label: "Đánh dấu là đã đọc",
+                                    disabled: !!n?.read,
+                                  },
+                                  {
+                                    key: "delete",
+                                    label: "Xóa thông báo này",
+                                    danger: true,
+                                  },
+                                ],
+                                onClick: async ({ key }) => {
+                                  if (key === "mark_read") await onMarkRead(n.id);
+                                  if (key === "delete") await onDelete(n.id);
+                                  setActionOpenId(null);
+                                },
+                              }}
+                            >
+                              <button
+                                type="button"
+                                className="notifications-center__more"
+                                aria-label="Tùy chọn thông báo"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <EllipsisOutlined />
+                              </button>
+                            </Dropdown>
+                            {!n?.read ? <div className="notifications-center__dot" /> : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {older.length > 0 ? (
+                  <div className="notifications-center__section">
+                    <div className="notifications-center__section-title">Trước đó</div>
+                    <div className="notifications-center__list">
+                      {older.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`notifications-center__item ${n?.read ? "is-read" : "is-unread"}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleOpen(n)}
+                        >
+                          <div className="notifications-center__avatar">
+                            <Avatar icon={<BellOutlined />} />
+                          </div>
+                          <div className="notifications-center__content">
+                            <div className="notifications-center__text">
+                              <Text strong>{n.title || "Thông báo"}</Text>
+                              {n.message ? <span className="notifications-center__sep">·</span> : null}
+                              {n.message ? <span>{n.message}</span> : null}
+                            </div>
+                            <div className="notifications-center__time">{formatRelativeTime(n.created_at)}</div>
+                          </div>
+
+                          <div className="notifications-center__actions" onClick={(e) => e.stopPropagation()}>
+                            <Dropdown
+                              trigger={["click"]}
+                              open={actionOpenId === n.id}
+                              onOpenChange={(open) => setActionOpenId(open ? n.id : null)}
+                              placement="bottomRight"
+                              getPopupContainer={(triggerNode) =>
+                                triggerNode?.closest?.(".notifications-center__card") || document.body
+                              }
+                              menu={{
+                                items: [
+                                  {
+                                    key: "mark_read",
+                                    label: "Đánh dấu là đã đọc",
+                                    disabled: !!n?.read,
+                                  },
+                                  {
+                                    key: "delete",
+                                    label: "Xóa thông báo này",
+                                    danger: true,
+                                  },
+                                ],
+                                onClick: async ({ key }) => {
+                                  if (key === "mark_read") await onMarkRead(n.id);
+                                  if (key === "delete") await onDelete(n.id);
+                                  setActionOpenId(null);
+                                },
+                              }}
+                            >
+                              <button
+                                type="button"
+                                className="notifications-center__more"
+                                aria-label="Tùy chọn thông báo"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <EllipsisOutlined />
+                              </button>
+                            </Dropdown>
+                            {!n?.read ? <div className="notifications-center__dot" /> : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
         </div>
-
-        <List
-          className="notifications-list"
-          dataSource={items}
-          locale={{ emptyText: "Chưa có thông báo" }}
-          renderItem={(item) => (
-            <List.Item className="notifications-list-item">
-              <div className={`notification-item ${item.read ? "is-read" : "is-unread"}`}>
-                <div className="notification-left">
-                  <Avatar className="notification-avatar" icon={<BellOutlined />} />
-                </div>
-
-                <div className="notification-body">
-                  <div className="notification-top">
-                    <div className="notification-title-row">
-                      <Text strong className="notification-title">
-                        {item.title}
-                      </Text>
-                      {!item.read ? <Tag color="red">Mới</Tag> : <Tag color="green">Đã đọc</Tag>}
-                    </div>
-                    <Text type="secondary" className="notification-time">
-                      {formatRelativeTime(item.created_at)}
-                    </Text>
-                  </div>
-
-                  {item.message ? <div className="notification-message">{item.message}</div> : null}
-
-                  <div className="notification-actions">
-                    {!item.read ? (
-                      <Button size="small" onClick={() => onMarkRead(item.id)}>
-                        Đánh dấu đã đọc
-                      </Button>
-                    ) : null}
-                    {item.link ? (
-                      <Button
-                        size="small"
-                        type="primary"
-                        onClick={() => {
-                          if (!item.read) onMarkRead(item.id);
-                          navigate(item.link);
-                        }}
-                      >
-                        Mở
-                      </Button>
-                    ) : null}
-
-                    {item.read ? (
-                      <Popconfirm
-                        title="Xóa thông báo"
-                        description="Bạn có chắc muốn xóa thông báo này?"
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        onConfirm={() => onDelete(item.id)}
-                      >
-                        <Button size="small" danger>
-                          Xóa
-                        </Button>
-                      </Popconfirm>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </List.Item>
-          )}
-        />
       </div>
     </div>
   );

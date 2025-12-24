@@ -47,6 +47,23 @@ const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+const JOB_POSITIONS = [
+  { key: "sales", label: "Nhân viên kinh doanh" },
+  { key: "accounting", label: "Kế toán" },
+  { key: "marketing", label: "Marketing" },
+  { key: "hr", label: "Hành chính nhân sự" },
+  { key: "customer-care", label: "Chăm sóc khách hàng" },
+  { key: "banking", label: "Ngân hàng" },
+  { key: "it", label: "IT" },
+  { key: "labor", label: "Lao động phổ thông" },
+  { key: "senior", label: "Senior" },
+  { key: "construction", label: "Kỹ sư xây dựng" },
+  { key: "design", label: "Thiết kế đồ họa" },
+  { key: "real-estate", label: "Bất động sản" },
+  { key: "education", label: "Giáo dục" },
+  { key: "telesales", label: "Telesales" },
+];
+
 function JobDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -157,6 +174,7 @@ function JobDetail() {
           jobType: jobData.type || jobData.jobType,
           salary: jobData.salary,
           level: jobData.jobLevel || jobData.level || "Entry Level",
+          position: jobData.position || "",
           description: jobData.description,
           requirements: jobData.requirements
             ? Array.isArray(jobData.requirements)
@@ -486,6 +504,7 @@ function JobDetail() {
         salary: values.salary,
         type: values.jobType,
         jobLevel: values.level,
+        position: values.position,
         requirements: convertToArray(values.requirements),
         desirable: convertToArray(values.desirable),
         benefits: convertToArray(values.benefits),
@@ -511,6 +530,7 @@ function JobDetail() {
         jobType: jobData.type || jobData.jobType,
         salary: jobData.salary,
         level: jobData.jobLevel || jobData.level || "Entry Level",
+        position: jobData.position || "",
         description: jobData.description,
         requirements: jobData.requirements
           ? Array.isArray(jobData.requirements)
@@ -979,6 +999,20 @@ function JobDetail() {
               <Option value="Senior">Senior</Option>
               <Option value="Junior">Junior</Option>
               <Option value="Fresher">Fresher</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Danh mục công việc"
+            name="position"
+            rules={[{ required: true, message: "Vui lòng chọn danh mục công việc!" }]}
+          >
+            <Select placeholder="Chọn danh mục">
+              {JOB_POSITIONS.map((pos) => (
+                <Option key={pos.key} value={pos.key}>
+                  {pos.label}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
