@@ -6,6 +6,7 @@ import {
   Form,
   Input,
   Modal,
+  Pagination,
   Space,
   Spin,
   Table,
@@ -41,6 +42,7 @@ function MyInterviews() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [scorecardMap, setScorecardMap] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
@@ -101,6 +103,10 @@ function MyInterviews() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [items.length]);
 
   const openConfirm = (record) => {
     setActive(record);
@@ -267,6 +273,12 @@ function MyInterviews() {
     },
   ];
 
+  const pageSize = 10;
+  const paginatedItems = (Array.isArray(items) ? items : []).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
@@ -295,11 +307,20 @@ function MyInterviews() {
         <div style={{ padding: "12px 24px 24px 24px", overflowX: "auto" }}>
           <Table
             columns={columns}
-            dataSource={(items || []).map((s) => ({ ...s, key: s.id }))}
-            pagination={{ pageSize: 10 }}
+            dataSource={(paginatedItems || []).map((s) => ({ ...s, key: s.id }))}
+            pagination={false}
             tableLayout="fixed"
             scroll={{ x: "max-content" }}
           />
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={(Array.isArray(items) ? items : []).length}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+            />
+          </div>
         </div>
       </Card>
 

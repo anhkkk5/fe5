@@ -2,6 +2,8 @@
   padding: 24px;
   background: #fff;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-header {
@@ -17,6 +19,18 @@
   font-weight: 600;
   color: #1f2937;
 }
+
+ .admin-table-container {
+   flex: 1;
+   min-height: 0;
+ }
+
+ .admin-pagination {
+   width: 100%;
+   display: flex;
+   justify-content: center;
+   margin-top: 16px;
+ }
 
  .admin-management-container .ant-table-pagination {
    width: 100% !important;

@@ -6,6 +6,7 @@ import {
   Drawer,
   Input,
   Modal,
+  Pagination,
   Select,
   Space,
   Spin,
@@ -44,6 +45,7 @@ function CompanyReviewsManagement() {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("pending");
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [active, setActive] = useState(null);
   const [activeLoading, setActiveLoading] = useState(false);
@@ -85,6 +87,16 @@ function CompanyReviewsManagement() {
       );
     });
   }, [items, search]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, status, items.length]);
+
+  const pageSize = 10;
+  const paginated = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const openDetail = async (record) => {
     setDrawerOpen(true);
@@ -294,13 +306,24 @@ function CompanyReviewsManagement() {
               <Spin />
             </div>
           ) : (
-            <Table
-              columns={columns}
-              dataSource={(filtered || []).map((x) => ({ ...x, key: x.id }))}
-              pagination={{ pageSize: 10 }}
-              tableLayout="fixed"
-              scroll={{ x: 1200 }}
-            />
+            <>
+              <Table
+                columns={columns}
+                dataSource={(paginated || []).map((x) => ({ ...x, key: x.id }))}
+                pagination={false}
+                tableLayout="fixed"
+                scroll={{ x: 1200 }}
+              />
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={filtered.length}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false}
+                />
+              </div>
+            </>
           )}
         </div>
       </Card>

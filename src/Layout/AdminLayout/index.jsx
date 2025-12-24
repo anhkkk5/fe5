@@ -25,28 +25,31 @@ function AdminLayout() {
 
   const getBreadcrumbItems = () => {
     const path = location.pathname;
+    if (path === "/admin" || path.includes("/admin/dashboard")) {
+      return [{ title: <Link to="/admin/dashboard">Dashboard</Link> }];
+    }
     if (path.includes("/admin/jobs")) {
       return [
-        { title: <Link to="/">Trang chủ</Link> },
+        { title: <Link to="/admin/dashboard">Dashboard</Link> },
         { title: "Quản lý việc làm" },
       ];
     } else if (path.includes("/admin/users")) {
       return [
-        { title: <Link to="/">Trang chủ</Link> },
+        { title: <Link to="/admin/dashboard">Dashboard</Link> },
         { title: "Quản lý người dùng" },
       ];
     } else if (path.includes("/admin/companies")) {
       return [
-        { title: <Link to="/">Trang chủ</Link> },
+        { title: <Link to="/admin/dashboard">Dashboard</Link> },
         { title: "Quản lý công ty" },
       ];
     } else if (path.includes("/admin/company-reviews")) {
       return [
-        { title: <Link to="/">Trang chủ</Link> },
+        { title: <Link to="/admin/dashboard">Dashboard</Link> },
         { title: "Duyệt đánh giá công ty" },
       ];
     }
-    return [{ title: "Trang chủ" }];
+    return [{ title: <Link to="/admin/dashboard">Dashboard</Link> }];
   };
 
   return (

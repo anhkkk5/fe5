@@ -18,7 +18,7 @@ function Login() {
 
   const redirectByRole = async (role) => {
     if (role === "admin") {
-      navigate("/admin/jobs", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
       return;
     }
 

@@ -10,6 +10,7 @@ import {
   message,
   Tabs,
   Spin,
+  Pagination,
 } from "antd";
 import {
   PlusOutlined,
@@ -32,10 +33,20 @@ function CompanyQuizManagement() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("question-sets");
   const [bulkImportVisible, setBulkImportVisible] = useState(false);
+  const [questionSetsPage, setQuestionSetsPage] = useState(1);
+  const [quizzesPage, setQuizzesPage] = useState(1);
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    setQuestionSetsPage(1);
+  }, [groupedQuestionSets.length]);
+
+  useEffect(() => {
+    setQuizzesPage(1);
+  }, [quizzes.length]);
 
   // Nhóm questions theo skillCategory (category field)
   const groupQuestionsBySkill = (questionsList) => {
@@ -219,6 +230,17 @@ function CompanyQuizManagement() {
     },
   ];
 
+  const pageSize = 10;
+  const paginatedQuestionSets = (Array.isArray(groupedQuestionSets) ? groupedQuestionSets : []).slice(
+    (questionSetsPage - 1) * pageSize,
+    questionSetsPage * pageSize,
+  );
+
+  const paginatedQuizzes = (Array.isArray(quizzes) ? quizzes : []).slice(
+    (quizzesPage - 1) * pageSize,
+    quizzesPage * pageSize,
+  );
+
   const handleDeleteQuestionGroup = (skillCategory) => {
     Modal.confirm({
       title: "Xác nhận xóa",
@@ -391,30 +413,56 @@ function CompanyQuizManagement() {
 
       <Tabs
         activeKey={activeTab}
-        onChange={setActiveTab}
+        onChange={(k) => {
+          setActiveTab(k);
+          if (k === "question-sets") setQuestionSetsPage(1);
+          if (k === "quizzes") setQuizzesPage(1);
+        }}
         items={[
           {
             key: "question-sets",
             label: "Danh sách câu hỏi (Bộ)",
             children: (
-              <Table
-                dataSource={groupedQuestionSets}
-                columns={questionSetsColumns}
-                rowKey="id"
-                pagination={{ pageSize: 10 }}
-              />
+              <>
+                <Table
+                  dataSource={paginatedQuestionSets}
+                  columns={questionSetsColumns}
+                  rowKey="id"
+                  pagination={false}
+                />
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                  <Pagination
+                    current={questionSetsPage}
+                    pageSize={pageSize}
+                    total={(Array.isArray(groupedQuestionSets) ? groupedQuestionSets : []).length}
+                    onChange={(p) => setQuestionSetsPage(p)}
+                    showSizeChanger={false}
+                  />
+                </div>
+              </>
             ),
           },
           {
             key: "quizzes",
             label: "Bài test",
             children: (
-              <Table
-                dataSource={quizzes}
-                columns={quizzesColumns}
-                rowKey="id"
-                pagination={{ pageSize: 10 }}
-              />
+              <>
+                <Table
+                  dataSource={paginatedQuizzes}
+                  columns={quizzesColumns}
+                  rowKey="id"
+                  pagination={false}
+                />
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                  <Pagination
+                    current={quizzesPage}
+                    pageSize={pageSize}
+                    total={(Array.isArray(quizzes) ? quizzes : []).length}
+                    onChange={(p) => setQuizzesPage(p)}
+                    showSizeChanger={false}
+                  />
+                </div>
+              </>
             ),
           },
         ]}

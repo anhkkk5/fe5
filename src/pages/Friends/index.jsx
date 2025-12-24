@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Card, Input, Space, Table, Tag, Typography, message } from "antd";
+import { Button, Card, Input, Pagination, Space, Table, Tag, Typography, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import { get } from "../../utils/axios/request";
@@ -13,6 +13,8 @@ function FriendsPage() {
   const [friends, setFriends] = useState([]);
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
+  const [friendsPage, setFriendsPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
 
   const userType = getCookie("userType");
 
@@ -69,6 +71,14 @@ function FriendsPage() {
     });
   }, [users, q]);
 
+  useEffect(() => {
+    setFriendsPage(1);
+  }, [friends.length]);
+
+  useEffect(() => {
+    setUsersPage(1);
+  }, [filteredUsers.length, q]);
+
   const onSend = async (userId) => {
     try {
       await sendFriendRequest(userId);
@@ -106,6 +116,19 @@ function FriendsPage() {
       width: 140,
     },
   ];
+
+  const friendsPageSize = 8;
+  const usersPageSize = 8;
+
+  const paginatedFriends = (Array.isArray(friends) ? friends : []).slice(
+    (friendsPage - 1) * friendsPageSize,
+    friendsPage * friendsPageSize,
+  );
+
+  const paginatedUsers = (Array.isArray(filteredUsers) ? filteredUsers : []).slice(
+    (usersPage - 1) * usersPageSize,
+    usersPage * usersPageSize,
+  );
 
   const userColumns = [
     {
@@ -160,10 +183,19 @@ function FriendsPage() {
               rowKey={(r) => r.friendshipId}
               loading={loading}
               columns={friendColumns}
-              dataSource={friends}
-              pagination={{ pageSize: 8 }}
+              dataSource={paginatedFriends}
+              pagination={false}
               locale={{ emptyText: "Chưa có bạn bè" }}
             />
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+              <Pagination
+                current={friendsPage}
+                pageSize={friendsPageSize}
+                total={(Array.isArray(friends) ? friends : []).length}
+                onChange={(page) => setFriendsPage(page)}
+                showSizeChanger={false}
+              />
+            </div>
           </div>
         </Card>
 
@@ -182,10 +214,19 @@ function FriendsPage() {
               rowKey={(r) => r.id}
               loading={loading}
               columns={userColumns}
-              dataSource={filteredUsers}
-              pagination={{ pageSize: 8 }}
+              dataSource={paginatedUsers}
+              pagination={false}
               locale={{ emptyText: "Không có người dùng" }}
             />
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+              <Pagination
+                current={usersPage}
+                pageSize={usersPageSize}
+                total={(Array.isArray(filteredUsers) ? filteredUsers : []).length}
+                onChange={(page) => setUsersPage(page)}
+                showSizeChanger={false}
+              />
+            </div>
           </Space>
         </Card>
       </Space>

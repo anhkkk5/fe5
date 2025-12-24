@@ -10,6 +10,7 @@ import {
   message,
   Modal,
   Form,
+  Pagination,
 } from "antd";
 import {
   SearchOutlined,
@@ -30,6 +31,7 @@ function UsersManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingUser, setEditingUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [starsModalOpen, setStarsModalOpen] = useState(false);
@@ -144,6 +146,16 @@ function UsersManagement() {
       user.phone?.toLowerCase().includes(searchLower)
     );
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, users.length]);
+
+  const pageSize = 10;
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const columns = [
     {
@@ -261,14 +273,26 @@ function UsersManagement() {
         />
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredUsers}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10, showSizeChanger: false, position: ["bottomCenter"] }}
-        scroll={{ x: 1200 }}
-      />
+      <div className="admin-table-container">
+        <Table
+          columns={columns}
+          dataSource={paginatedUsers}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          scroll={{ x: 1200 }}
+        />
+      </div>
+
+      <div className="admin-pagination">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredUsers.length}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+        />
+      </div>
 
       <Modal
         title="Chỉnh sửa người dùng"

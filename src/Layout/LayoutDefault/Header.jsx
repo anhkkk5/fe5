@@ -155,7 +155,7 @@ function Header() {
 
     const resolvedFullName = getCookie("fullName");
 
-    const name = type === "candidate" ? resolvedFullName : type === "admin" ? resolvedFullName : companyName;
+    const name = type === "admin" ? "admin" : type === "candidate" ? resolvedFullName : companyName;
     setUserName(name || "");
     if (type === "company" && id) {
       setCompanyId(id);
@@ -366,11 +366,15 @@ function Header() {
           },
         ]
       : []),
-    {
-      key: "profile",
-      label: "Thông tin cá nhân",
-      onClick: () => navigate("/profile"),
-    },
+    ...(userType !== "admin"
+      ? [
+          {
+            key: "profile",
+            label: "Thông tin cá nhân",
+            onClick: () => navigate("/profile"),
+          },
+        ]
+      : []),
     ...(userType === "candidate"
       ? [
           {
@@ -402,7 +406,7 @@ function Header() {
           <nav className="header__top-nav">
             {userType === "admin" ? (
               <>
-                <NavLink to="/" className="header__top-link">Trang chủ</NavLink>
+                <NavLink to="/admin/dashboard" className="header__top-link">Dashboard</NavLink>
                 <NavLink to="/admin/jobs" className="header__top-link">Quản lý việc làm</NavLink>
                 <NavLink to="/admin/companies" className="header__top-link">Quản lý công ty</NavLink>
                 <NavLink to="/admin/users" className="header__top-link">Quản lý người dùng</NavLink>

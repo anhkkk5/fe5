@@ -89,6 +89,7 @@ import PostsList from "../pages/Posts/index.jsx";
 import PostDetail from "../pages/Posts/PostDetail.jsx";
 
 /* Admin */
+import AdminDashboard from "../pages/Admin/Dashboard/index.jsx";
 import JobsManagement from "../pages/Admin/JobsManagement/index.jsx";
 import UsersManagement from "../pages/Admin/UsersManagement/index.jsx";
 import CompaniesManagement from "../pages/Admin/CompaniesManagement/index.jsx";
@@ -183,6 +184,8 @@ export const routes = [
     path: "/admin",
     element: <AdminLayout />,
     children: [
+      { index: true, element: <AdminDashboard /> },
+      { path: "dashboard", element: <AdminDashboard /> },
       { path: "jobs", element: <JobsManagement /> },
       { path: "users", element: <UsersManagement /> },
       { path: "companies", element: <CompaniesManagement /> },

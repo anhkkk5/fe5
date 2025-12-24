@@ -6,6 +6,7 @@ import {
   Form,
   Input,
   Modal,
+  Pagination,
   Row,
   Select,
   Space,
@@ -43,6 +44,7 @@ function CompanyInterviewSchedules() {
   const [loading, setLoading] = useState(true);
   const [approvedApps, setApprovedApps] = useState([]);
   const [schedules, setSchedules] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
@@ -140,6 +142,10 @@ function CompanyInterviewSchedules() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [schedules.length]);
 
   const appOptions = useMemo(() => {
     return approvedApps.map((a) => {
@@ -353,6 +359,12 @@ function CompanyInterviewSchedules() {
     },
   ];
 
+  const pageSize = 10;
+  const paginatedSchedules = (Array.isArray(schedules) ? schedules : []).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
@@ -379,11 +391,20 @@ function CompanyInterviewSchedules() {
         <div style={{ marginTop: 16 }}>
           <Table
             columns={scheduleColumns}
-            dataSource={(schedules || []).map((s) => ({ ...s, key: s.id }))}
-            pagination={{ pageSize: 10 }}
+            dataSource={(paginatedSchedules || []).map((s) => ({ ...s, key: s.id }))}
+            pagination={false}
             tableLayout="fixed"
             scroll={{ x: 1200 }}
           />
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={(Array.isArray(schedules) ? schedules : []).length}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+            />
+          </div>
         </div>
       </Card>
 

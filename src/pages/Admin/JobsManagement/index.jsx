@@ -11,6 +11,7 @@ import {
   Modal,
   Form,
   InputNumber,
+  Pagination,
 } from "antd";
 import {
   SearchOutlined,
@@ -35,6 +36,7 @@ function JobsManagement() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingJob, setEditingJob] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -157,6 +159,16 @@ function JobsManagement() {
     );
   });
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, jobs.length]);
+
+  const pageSize = 10;
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   const columns = [
     {
       title: "ID",
@@ -259,14 +271,26 @@ function JobsManagement() {
         />
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredJobs}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10, showSizeChanger: false, position: ["bottomCenter"] }}
-        scroll={{ x: 1200 }}
-      />
+      <div className="admin-table-container">
+        <Table
+          columns={columns}
+          dataSource={paginatedJobs}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          scroll={{ x: 1200 }}
+        />
+      </div>
+
+      <div className="admin-pagination">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredJobs.length}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+        />
+      </div>
 
       <Modal
         title="Chỉnh sửa việc làm"

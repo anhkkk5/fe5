@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Table, Tag, Typography, Spin, message } from "antd";
+import { Card, Table, Tag, Typography, Spin, message, Pagination } from "antd";
 import { StarOutlined, StarFilled } from "@ant-design/icons";
 import { getCookie } from "../../helpers/cookie";
 import { getMyApplications } from "../../services/applications/applicationsServices";
@@ -19,6 +19,7 @@ function AppliedJobs() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [savedIds, setSavedIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const token = getCookie("token") || localStorage.getItem("token");
@@ -90,6 +91,10 @@ function AppliedJobs() {
 
     load();
   }, [navigate]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [items.length]);
 
   const toggleSave = (jobId) => {
     if (!jobId) return;
@@ -171,6 +176,12 @@ function AppliedJobs() {
     },
   ];
 
+  const pageSize = 10;
+  const paginatedItems = (Array.isArray(items) ? items : []).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
@@ -188,11 +199,22 @@ function AppliedJobs() {
         {items.length === 0 ? (
           <Text>Hiện bạn chưa ứng tuyển công việc nào.</Text>
         ) : (
-          <Table
-            columns={columns}
-            dataSource={items}
-            pagination={{ pageSize: 10 }}
-          />
+          <>
+            <Table
+              columns={columns}
+              dataSource={paginatedItems}
+              pagination={false}
+            />
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={(Array.isArray(items) ? items : []).length}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false}
+              />
+            </div>
+          </>
         )}
       </Card>
     </div>

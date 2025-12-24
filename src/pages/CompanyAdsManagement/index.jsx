@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Tag, Button, message, Spin, Form, InputNumber, Input, Switch, Space } from "antd";
+import { Card, Table, Tag, Button, message, Spin, Form, InputNumber, Input, Switch, Space, Pagination } from "antd";
 import { get, edit, post, del } from "../../utils/axios/request";
 import "./style.css";
 
@@ -20,6 +20,7 @@ function CompanyAdsManagement() {
   const [loading, setLoading] = useState(false);
   const [savingSlot, setSavingSlot] = useState(false);
   const [updatingBooking, setUpdatingBooking] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [form] = Form.useForm();
 
   const loadData = async () => {
@@ -49,6 +50,10 @@ function CompanyAdsManagement() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [bookings.length]);
 
   const handleSaveSlot = async (values) => {
     try {
@@ -159,6 +164,12 @@ function CompanyAdsManagement() {
     },
   ];
 
+  const pageSize = 5;
+  const paginatedBookings = (Array.isArray(bookings) ? bookings : []).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   if (loading) {
     return (
       <div className="company-ads__loading">
@@ -215,11 +226,20 @@ function CompanyAdsManagement() {
       <Card title="Các yêu cầu thuê quảng cáo" className="company-ads__bookings-card">
         <Table
           rowKey="id"
-          dataSource={bookings}
+          dataSource={paginatedBookings}
           columns={columns}
-          pagination={{ pageSize: 5 }}
+          pagination={false}
           loading={updatingBooking}
         />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={(Array.isArray(bookings) ? bookings : []).length}
+            onChange={(page) => setCurrentPage(page)}
+            showSizeChanger={false}
+          />
+        </div>
       </Card>
     </div>
   );

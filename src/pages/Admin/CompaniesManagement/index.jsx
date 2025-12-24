@@ -10,6 +10,7 @@ import {
   message,
   Modal,
   Form,
+  Pagination,
 } from "antd";
 import {
   SearchOutlined,
@@ -30,6 +31,7 @@ function CompaniesManagement() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingCompany, setEditingCompany] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [starsModalOpen, setStarsModalOpen] = useState(false);
@@ -144,6 +146,16 @@ function CompaniesManagement() {
       company.id?.toLowerCase().includes(searchLower)
     );
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, companies.length]);
+
+  const pageSize = 10;
+  const paginatedCompanies = filteredCompanies.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const columns = [
     {
@@ -262,14 +274,26 @@ function CompaniesManagement() {
         />
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredCompanies}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 1200 }}
-      />
+      <div className="admin-table-container">
+        <Table
+          columns={columns}
+          dataSource={paginatedCompanies}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          scroll={{ x: 1200 }}
+        />
+      </div>
+
+      <div className="admin-pagination">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredCompanies.length}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+        />
+      </div>
 
       <Modal
         title="Chỉnh sửa công ty"

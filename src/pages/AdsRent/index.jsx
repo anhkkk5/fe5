@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Spin, Empty, Tag, message, Modal, Form, Input, InputNumber, Upload, Table, Space } from "antd";
+import { Card, Button, Spin, Empty, Tag, message, Modal, Form, Input, InputNumber, Upload, Table, Space, Pagination } from "antd";
 import { StarOutlined, GlobalOutlined, EnvironmentOutlined, UploadOutlined } from "@ant-design/icons";
 import { get, post } from "../../utils/axios/request";
 import { getCookie } from "../../helpers/cookie.jsx";
@@ -11,6 +11,7 @@ function AdsRent() {
   const [loading, setLoading] = useState(false);
   const [myBookings, setMyBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [bookingPage, setBookingPage] = useState(1);
   const [payingBookingId, setPayingBookingId] = useState(null);
   const [rentModalOpen, setRentModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -50,6 +51,10 @@ function AdsRent() {
     fetchSlots();
     fetchMyBookings();
   }, []);
+
+  useEffect(() => {
+    setBookingPage(1);
+  }, [myBookings.length]);
 
   const refreshMyBookings = async () => {
     try {
@@ -217,6 +222,12 @@ function AdsRent() {
     },
   ];
 
+  const bookingPageSize = 5;
+  const paginatedBookings = (Array.isArray(myBookings) ? myBookings : []).slice(
+    (bookingPage - 1) * bookingPageSize,
+    bookingPage * bookingPageSize,
+  );
+
   return (
     <div className="ads-rent">
       <div className="ads-rent__header">
@@ -227,11 +238,20 @@ function AdsRent() {
       <Card title="Yêu cầu thuê quảng cáo của tôi" style={{ marginBottom: 16 }}>
         <Table
           rowKey="id"
-          dataSource={myBookings}
+          dataSource={paginatedBookings}
           columns={bookingColumns}
-          pagination={{ pageSize: 5 }}
+          pagination={false}
           loading={loadingBookings}
         />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+          <Pagination
+            current={bookingPage}
+            pageSize={bookingPageSize}
+            total={(Array.isArray(myBookings) ? myBookings : []).length}
+            onChange={(page) => setBookingPage(page)}
+            showSizeChanger={false}
+          />
+        </div>
       </Card>
 
       {loading ? (
