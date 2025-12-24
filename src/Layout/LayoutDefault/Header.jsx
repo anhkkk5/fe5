@@ -53,6 +53,7 @@ function Header() {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
   const [userType, setUserType] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -321,6 +322,7 @@ function Header() {
       setIsLoggedIn(false);
       setUserType("");
       setUserName("");
+      setUserAvatar("");
       setCompanyId("");
       setUnreadNotifications(0);
       return;
@@ -354,9 +356,11 @@ function Header() {
     }
 
     const resolvedFullName = getCookie("fullName");
+    const resolvedAvatar = getCookie("avatarUrl") || "";
 
     const name = type === "admin" ? "admin" : type === "candidate" ? resolvedFullName : companyName;
     setUserName(name || "");
+    setUserAvatar(resolvedAvatar || "");
     if (type === "company" && id) {
       setCompanyId(id);
     }
@@ -436,12 +440,17 @@ function Header() {
       const token = getCookie("token") || localStorage.getItem("token");
       const type = getCookie("userType") || (token ? decodeJwt(token)?.role : "");
       const fullName = getCookie("fullName");
-      if (!token || type !== "candidate" || fullName) return;
+      const avatarUrl = getCookie("avatarUrl");
+      if (!token || type !== "candidate" || (fullName && avatarUrl)) return;
       try {
         const me = await getMyCandidateProfile();
         if (me?.fullName) {
           setCookie("fullName", me.fullName, 1);
           setUserName(me.fullName);
+        }
+        if (me?.avatarUrl) {
+          setCookie("avatarUrl", me.avatarUrl, 1);
+          setUserAvatar(me.avatarUrl);
         }
       } catch {}
     };
@@ -984,9 +993,18 @@ function Header() {
                         alignItems: "center",
                         justifyContent: "center",
                         color: "white",
+                        overflow: "hidden",
                       }}
                     >
-                      <UserOutlined style={{ fontSize: "20px" }} />
+                      {userAvatar ? (
+                        <img
+                          src={userAvatar}
+                          alt="avatar"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <UserOutlined style={{ fontSize: "20px" }} />
+                      )}
                     </div>
                     <span style={{ color: "#c41e3a", fontWeight: "500" }}>{userName || "User"}</span>
                   </div>

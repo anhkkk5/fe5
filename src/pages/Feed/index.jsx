@@ -571,7 +571,17 @@ function FeedPage() {
               dataSource={items}
               locale={{ emptyText: <Empty description="Chưa có bài đăng" /> }}
               renderItem={(item) => {
-                const authorName = item?.user?.name || "Người dùng";
+                const authorName =
+                  item?.user?.candidateProfile?.fullName ||
+                  item?.user?.company?.companyName ||
+                  item?.user?.company?.fullName ||
+                  item?.user?.name ||
+                  "Người dùng";
+
+                const authorAvatar =
+                  item?.user?.candidateProfile?.avatarUrl ||
+                  item?.user?.company?.logo ||
+                  null;
                 const role = item?.user?.role;
                 const createdAt = item?.created_at;
 
@@ -598,7 +608,9 @@ function FeedPage() {
                     <Card id={`post-${item?.id}`} style={{ width: "100%" }} bodyStyle={{ padding: 16 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ display: "flex", gap: 12, minWidth: 0, flex: 1 }}>
-                          <Avatar size={40}>{String(authorName || "U").slice(0, 1).toUpperCase()}</Avatar>
+                          <Avatar size={40} src={authorAvatar || undefined}>
+                            {String(authorName || "U").slice(0, 1).toUpperCase()}
+                          </Avatar>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               <Text strong style={{ fontSize: 14 }}>
@@ -814,12 +826,14 @@ function FeedPage() {
                   dataSource={reactionsModalItems}
                   renderItem={(it) => {
                     const u = it?.user;
+                    const avatar = u?.candidateProfile?.avatarUrl || u?.company?.logo || null;
+                    const name = u?.candidateProfile?.fullName || u?.company?.companyName || u?.company?.fullName || u?.name || "Người dùng";
                     return (
                       <List.Item>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
-                          <Avatar>{String(u?.name || "U").slice(0, 1).toUpperCase()}</Avatar>
+                          <Avatar src={avatar || undefined}>{String(name || "U").slice(0, 1).toUpperCase()}</Avatar>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <Text strong>{u?.name || "Người dùng"}</Text>
+                            <Text strong>{name}</Text>
                           </div>
                           <div style={{ width: 36, textAlign: "right" }}>{renderReactionIcon(it?.type, 18)}</div>
                         </div>
@@ -853,7 +867,20 @@ function FeedPage() {
                     {(commentsTree || []).map((c) => (
                       <div key={c.id}>
                         <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <Avatar size={34}>{String(c?.user?.name || "U").slice(0, 1).toUpperCase()}</Avatar>
+                          <Avatar
+                            size={34}
+                            src={c?.user?.candidateProfile?.avatarUrl || c?.user?.company?.logo || undefined}
+                          >
+                            {String(
+                              c?.user?.candidateProfile?.fullName ||
+                                c?.user?.company?.companyName ||
+                                c?.user?.company?.fullName ||
+                                c?.user?.name ||
+                                "U",
+                            )
+                              .slice(0, 1)
+                              .toUpperCase()}
+                          </Avatar>
                           <div style={{ flex: 1 }}>
                             <div
                               style={{
@@ -862,7 +889,13 @@ function FeedPage() {
                                 padding: "8px 12px",
                               }}
                             >
-                              <Text strong>{c?.user?.name || "Người dùng"}</Text>
+                              <Text strong>
+                                {c?.user?.candidateProfile?.fullName ||
+                                  c?.user?.company?.companyName ||
+                                  c?.user?.company?.fullName ||
+                                  c?.user?.name ||
+                                  "Người dùng"}
+                              </Text>
                               <div style={{ whiteSpace: "pre-wrap" }}>{c?.content}</div>
                             </div>
                             <div style={{ marginTop: 6, display: "flex", gap: 10 }}>
@@ -892,7 +925,20 @@ function FeedPage() {
                               <div style={{ marginTop: 10, paddingLeft: 34, display: "flex", flexDirection: "column", gap: 10 }}>
                                 {c.replies.map((r) => (
                                   <div key={r.id} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                                    <Avatar size={28}>{String(r?.user?.name || "U").slice(0, 1).toUpperCase()}</Avatar>
+                                    <Avatar
+                                      size={28}
+                                      src={r?.user?.candidateProfile?.avatarUrl || r?.user?.company?.logo || undefined}
+                                    >
+                                      {String(
+                                        r?.user?.candidateProfile?.fullName ||
+                                          r?.user?.company?.companyName ||
+                                          r?.user?.company?.fullName ||
+                                          r?.user?.name ||
+                                          "U",
+                                      )
+                                        .slice(0, 1)
+                                        .toUpperCase()}
+                                    </Avatar>
                                     <div style={{ flex: 1 }}>
                                       <div
                                         style={{
@@ -901,7 +947,13 @@ function FeedPage() {
                                           padding: "8px 12px",
                                         }}
                                       >
-                                        <Text strong>{r?.user?.name || "Người dùng"}</Text>
+                                        <Text strong>
+                                          {r?.user?.candidateProfile?.fullName ||
+                                            r?.user?.company?.companyName ||
+                                            r?.user?.company?.fullName ||
+                                            r?.user?.name ||
+                                            "Người dùng"}
+                                        </Text>
                                         <div style={{ whiteSpace: "pre-wrap" }}>{r?.content}</div>
                                       </div>
                                     </div>
@@ -958,6 +1010,8 @@ function FeedPage() {
                   dataSource={shareFriends}
                   renderItem={(f) => {
                     const u = f?.friend;
+                    const avatar = u?.candidateProfile?.avatarUrl || u?.company?.logo || u?.avatarUrl || u?.avatar || null;
+                    const name = u?.candidateProfile?.fullName || u?.company?.companyName || u?.company?.fullName || u?.fullName || u?.name || "Người dùng";
                     return (
                       <List.Item>
                         <Card
@@ -965,11 +1019,11 @@ function FeedPage() {
                           bodyStyle={{ padding: 10, textAlign: "center" }}
                           onClick={() => handleShareToFriend(u?.id)}
                         >
-                          <Avatar size={46} style={{ marginBottom: 8 }}>
-                            {String(u?.name || "U").slice(0, 1).toUpperCase()}
+                          <Avatar size={46} style={{ marginBottom: 8 }} src={avatar || undefined}>
+                            {String(name || "U").slice(0, 1).toUpperCase()}
                           </Avatar>
                           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {u?.name || "Người dùng"}
+                            {name}
                           </div>
                           <Button type="primary" size="small" loading={String(shareSendingUserId || "") === String(u?.id || "")}>
                             Gửi
