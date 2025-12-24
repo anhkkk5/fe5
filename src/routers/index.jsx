@@ -68,6 +68,8 @@ import CompanyAdsManagement from "../pages/CompanyAdsManagement/index.jsx";
 /* Company reviews */
 import CompanyReviewsPage from "../pages/CompanyReviews/index.jsx";
 import CompanyReviewDetail from "../pages/CompanyReviewDetail/index.jsx";
+import { getCookie } from "../helpers/cookie";
+import { Navigate } from "react-router-dom";
 
 /* Quiz management */
 import CompanyQuizManagement from "../pages/CompanyQuizManagement/index.jsx";
@@ -96,6 +98,12 @@ import CompaniesManagement from "../pages/Admin/CompaniesManagement/index.jsx";
 import PostsManagement from "../pages/Admin/PostsManagement/index.jsx";
 import CompanyReviewsManagement from "../pages/Admin/CompanyReviewsManagement/index.jsx";
 
+const RequireLogin = ({ children }) => {
+  const token = getCookie("token") || localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+};
+
 export const routes = [
   {
     path: "/",
@@ -109,8 +117,22 @@ export const routes = [
       { path: "companies", element: <CompaniesPage /> },
       { path: "companies/:id", element: <CompanyDetail /> },
 
-      { path: "company-reviews", element: <CompanyReviewsPage /> },
-      { path: "company-reviews/:id", element: <CompanyReviewDetail /> },
+      {
+        path: "company-reviews",
+        element: (
+          <RequireLogin>
+            <CompanyReviewsPage />
+          </RequireLogin>
+        ),
+      },
+      {
+        path: "company-reviews/:id",
+        element: (
+          <RequireLogin>
+            <CompanyReviewDetail />
+          </RequireLogin>
+        ),
+      },
       { path: "company-ads", element: <CompanyAdsManagement /> },
 
       // Finance tools

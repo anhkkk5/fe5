@@ -38,12 +38,12 @@ import {
   BarChartOutlined,
 } from "@ant-design/icons";
 
-import { Badge, Dropdown, Menu } from "antd";
+import { Badge, Dropdown, Menu, Spin } from "antd";
 
 import { getAllCompany, getMyCompany, updateMyCompany } from "../../services/getAllCompany/companyServices";
 import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
 import { decodeJwt } from "../../services/auth/authServices";
-import { getMyNotifications } from "../../services/notifications/notificationsServices";
+import { getMyNotifications, markNotificationRead } from "../../services/notifications/notificationsServices";
 import { connectSocket, disconnectSocket } from "../../realtime/socketClient";
 import logoImage from "../../assets/logologin.png";
 
@@ -54,11 +54,148 @@ function Header() {
   const [userName, setUserName] = useState("");
   const [userType, setUserType] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifItems, setNotifItems] = useState([]);
+  const [notifTab, setNotifTab] = useState("all");
   const [companyId, setCompanyId] = useState("");
   const [companies, setCompanies] = useState([]);
   const [isJobMenuOpen, setIsJobMenuOpen] = useState(false);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const [isCareerGuideMenuOpen, setIsCareerGuideMenuOpen] = useState(false);
+
+  const formatRelativeTime = (input) => {
+    if (!input) return "";
+    const dt = new Date(input);
+    if (Number.isNaN(dt.getTime())) return "";
+    const diffMs = Date.now() - dt.getTime();
+    const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+    if (diffSec < 60) return "Vừa xong";
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin} phút`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr} giờ`;
+    const diffDay = Math.floor(diffHr / 24);
+    return `${diffDay} ngày`;
+  };
+
+  const loadNotifPanel = async () => {
+    if (!isLoggedIn) return;
+    setNotifLoading(true);
+    try {
+      const data = await getMyNotifications();
+      setNotifItems(Array.isArray(data) ? data : []);
+    } catch (_e) {
+      setNotifItems([]);
+    } finally {
+      setNotifLoading(false);
+    }
+  };
+
+  const handleNotifClick = async (n) => {
+    try {
+      if (!n?.read) {
+        await markNotificationRead(n.id);
+        setNotifItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: 1 } : x)));
+        setUnreadNotifications((prev) => Math.max(0, (Number(prev) || 0) - 1));
+      }
+    } catch (_e) {}
+
+    setNotifOpen(false);
+    if (n?.link) {
+      navigate(n.link);
+      return;
+    }
+    navigate("/notifications");
+  };
+
+  const notifList = (notifTab === "unread" ? notifItems.filter((n) => !n?.read) : notifItems).slice(0, 8);
+
+  const notifOverlay = (
+    <div className="header__notif-panel" onClick={(e) => e.stopPropagation()}>
+      <div className="header__notif-panel-header">
+        <div className="header__notif-panel-title">Thông báo</div>
+        <button
+          type="button"
+          className="header__notif-panel-more"
+          onClick={() => navigate("/notifications")}
+        >
+          ...
+        </button>
+      </div>
+
+      <div className="header__notif-panel-tabs">
+        <button
+          type="button"
+          className={`header__notif-tab ${notifTab === "all" ? "is-active" : ""}`}
+          onClick={() => setNotifTab("all")}
+        >
+          Tất cả
+        </button>
+        <button
+          type="button"
+          className={`header__notif-tab ${notifTab === "unread" ? "is-active" : ""}`}
+          onClick={() => setNotifTab("unread")}
+        >
+          Chưa đọc
+        </button>
+
+        <button
+          type="button"
+          className="header__notif-viewall"
+          onClick={() => {
+            setNotifOpen(false);
+            navigate("/notifications");
+          }}
+        >
+          Xem tất cả
+        </button>
+      </div>
+
+      <div className="header__notif-panel-body">
+        {notifLoading ? (
+          <div className="header__notif-loading">
+            <Spin size="small" />
+          </div>
+        ) : notifList.length === 0 ? (
+          <div className="header__notif-empty">Chưa có thông báo</div>
+        ) : (
+          notifList.map((n) => (
+            <div
+              key={n.id}
+              className={`header__notif-item ${n?.read ? "is-read" : "is-unread"}`}
+              onClick={() => handleNotifClick(n)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="header__notif-item-avatar">
+                <BellOutlined />
+              </div>
+              <div className="header__notif-item-content">
+                <div className="header__notif-item-top">
+                  <div className="header__notif-item-title">{n.title || "Thông báo"}</div>
+                  <div className="header__notif-item-time">{formatRelativeTime(n.created_at)}</div>
+                </div>
+                <div className="header__notif-item-message">{n.message || ""}</div>
+              </div>
+              {!n?.read ? <div className="header__notif-dot" /> : null}
+            </div>
+          ))
+        )}
+      </div>
+
+      <button
+        type="button"
+        className="header__notif-footer"
+        onClick={() => {
+          setNotifOpen(false);
+          navigate("/notifications");
+        }}
+      >
+        Xem thông báo trước đó
+      </button>
+    </div>
+  );
 
   // ----- MENU DỮ LIỆU -----
   const jobShortcuts = [
@@ -266,14 +403,15 @@ function Header() {
   const handleLogout = () => navigate("/logout");
 
   // Tùy loại user mà ẩn/bớt một số công cụ
-  const visibleToolShortcuts =
-    userType === "company"
-      ? toolShortcuts.filter(
-          (item) =>
-            item.key !== "skill-assessment" &&
-            item.key !== "company-reviews"
-        )
-      : toolShortcuts;
+  const visibleToolShortcuts = toolShortcuts.filter((item) => {
+    if (userType === "company" && (item.key === "skill-assessment" || item.key === "company-reviews")) {
+      return false;
+    }
+    if (!isLoggedIn && item.key === "company-reviews") {
+      return false;
+    }
+    return true;
+  });
 
   const handleNavigateAndClose = (path) => {
     if (path) navigate(path);
@@ -434,7 +572,7 @@ function Header() {
                     Việc làm
                   </NavLink>
 
-                  {!isLoggedIn && (
+                  {isLoggedIn && (
                     <NavLink
                       to="/company-reviews"
                       className={`header__top-link ${
@@ -757,10 +895,20 @@ function Header() {
                   offset={[0, 2]}
                   showZero={false}
                 >
-                  <BellOutlined
-                    style={{ fontSize: "24px", color: "#c41e3a", cursor: "pointer" }}
-                    onClick={() => navigate("/notifications")}
-                  />
+                  <Dropdown
+                    trigger={["click"]}
+                    open={notifOpen}
+                    onOpenChange={(open) => {
+                      setNotifOpen(open);
+                      if (open) loadNotifPanel();
+                    }}
+                    placement="bottomRight"
+                    dropdownRender={() => notifOverlay}
+                  >
+                    <BellOutlined
+                      style={{ fontSize: "24px", color: "#c41e3a", cursor: "pointer" }}
+                    />
+                  </Dropdown>
                 </Badge>
 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">

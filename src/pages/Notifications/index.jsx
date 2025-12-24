@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, List, Popconfirm, Space, Spin, Tag, Typography, message } from "antd";
-import { BellOutlined } from "@ant-design/icons";
+import { Avatar, Button, List, Popconfirm, Spin, Tag, Typography, message } from "antd";
+import { BellOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import "./style.css";
@@ -11,6 +11,33 @@ import {
 } from "../../services/notifications/notificationsServices";
 
 const { Title, Text } = Typography;
+
+const formatHeaderDate = (d) => {
+  try {
+    return d.toLocaleDateString("vi-VN", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+    });
+  } catch (_e) {
+    return "";
+  }
+};
+
+const formatRelativeTime = (input) => {
+  if (!input) return "";
+  const dt = new Date(input);
+  if (Number.isNaN(dt.getTime())) return "";
+  const diffMs = Date.now() - dt.getTime();
+  const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+  if (diffSec < 60) return "vừa xong";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} phút trước`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} giờ trước`;
+  const diffDay = Math.floor(diffHr / 24);
+  return `${diffDay} ngày trước`;
+};
 
 function NotificationsPage() {
   const navigate = useNavigate();
@@ -103,32 +130,50 @@ function NotificationsPage() {
 
   return (
     <div className="notifications-page">
-      <Card className="notifications-card" bodyStyle={{ padding: 24 }}>
-        <div className="notifications-header">
-          <Title level={3} style={{ margin: 0 }}>
-            <Space>
-              <BellOutlined />
-              Thông báo
-            </Space>
-          </Title>
-          <Button onClick={load}>Tải lại</Button>
+      <div className="notifications-shell">
+        <div className="notifications-hero">
+          <div className="notifications-date">{formatHeaderDate(new Date())}</div>
+          <div className="notifications-hero-row">
+            <Title level={2} className="notifications-hero-title">
+              Trung tâm thông báo
+            </Title>
+            <Button
+              className="notifications-close"
+              type="text"
+              shape="circle"
+              icon={<CloseOutlined />}
+              onClick={() => navigate(-1)}
+              aria-label="Đóng"
+            />
+          </div>
+          <div className="notifications-hero-actions">
+            <Button className="notifications-reload" onClick={load}>
+              Tải lại
+            </Button>
+          </div>
         </div>
 
-        <div style={{ marginTop: 16 }}>
-          <List
-            className="notifications-list"
-            dataSource={items}
-            locale={{ emptyText: "Chưa có thông báo" }}
-            renderItem={(item) => (
-              <List.Item className="notifications-list-item">
-                <div className={`notification-item ${item.read ? "is-read" : "is-unread"}`}>
+        <List
+          className="notifications-list"
+          dataSource={items}
+          locale={{ emptyText: "Chưa có thông báo" }}
+          renderItem={(item) => (
+            <List.Item className="notifications-list-item">
+              <div className={`notification-item ${item.read ? "is-read" : "is-unread"}`}>
+                <div className="notification-left">
+                  <Avatar className="notification-avatar" icon={<BellOutlined />} />
+                </div>
+
+                <div className="notification-body">
                   <div className="notification-top">
                     <div className="notification-title-row">
-                      <Text strong className="notification-title">{item.title}</Text>
+                      <Text strong className="notification-title">
+                        {item.title}
+                      </Text>
                       {!item.read ? <Tag color="red">Mới</Tag> : <Tag color="green">Đã đọc</Tag>}
                     </div>
                     <Text type="secondary" className="notification-time">
-                      {item.created_at ? new Date(item.created_at).toLocaleString("vi-VN") : ""}
+                      {formatRelativeTime(item.created_at)}
                     </Text>
                   </div>
 
@@ -168,11 +213,11 @@ function NotificationsPage() {
                     ) : null}
                   </div>
                 </div>
-              </List.Item>
-            )}
-          />
-        </div>
-      </Card>
+              </div>
+            </List.Item>
+          )}
+        />
+      </div>
     </div>
   );
 }

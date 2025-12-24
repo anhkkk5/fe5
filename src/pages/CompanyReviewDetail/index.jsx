@@ -166,7 +166,7 @@ function CompanyReviewDetail() {
             </Title>
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--website">
                   <div className="overview-item-icon overview-icon-website">
                     <GlobalOutlined />
                   </div>
@@ -191,7 +191,7 @@ function CompanyReviewDetail() {
               </Col>
 
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--email">
                   <div className="overview-item-icon overview-icon-email">
                     <MailOutlined />
                   </div>
@@ -211,7 +211,7 @@ function CompanyReviewDetail() {
               </Col>
 
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--location">
                   <div className="overview-item-icon overview-icon-location">
                     <EnvironmentOutlined />
                   </div>
@@ -225,7 +225,7 @@ function CompanyReviewDetail() {
               </Col>
 
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--team">
                   <div className="overview-item-icon overview-icon-team">
                     <TeamOutlined />
                   </div>
@@ -239,15 +239,17 @@ function CompanyReviewDetail() {
               </Col>
 
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--field">
                   <div className="overview-item-icon overview-icon-field">
                     <FileTextOutlined />
                   </div>
                   <div className="overview-item-content">
                     <div className="overview-item-label">Lĩnh vực hoạt động</div>
-                    <div className="overview-item-value">
+                    <div className="overview-item-value overview-item-value--multiline">
                       {company.description ? (
-                        <Tag color="processing">{company.description}</Tag>
+                        <Tag color="processing" className="overview-multiline-tag">
+                          {company.description}
+                        </Tag>
                       ) : (
                         <Text type="secondary">Chưa cập nhật</Text>
                       )}
@@ -257,7 +259,7 @@ function CompanyReviewDetail() {
               </Col>
 
               <Col xs={24} sm={12} md={8}>
-                <div className="overview-item">
+                <div className="overview-item overview-item--calendar">
                   <div className="overview-item-icon overview-icon-calendar">
                     <CalendarOutlined />
                   </div>
