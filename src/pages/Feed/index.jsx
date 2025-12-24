@@ -3,6 +3,7 @@ import {
   Avatar,
   Button,
   Card,
+  Image,
   Modal,
   Empty,
   Form,
@@ -36,7 +37,7 @@ import {
 } from "../../services/feedPostReactions/feedPostReactionsServices.jsx";
 import { createFeedPostComment, getFeedPostComments } from "../../services/feedPostComments/feedPostCommentsServices.jsx";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const TYPE_OPTIONS = [
@@ -99,6 +100,8 @@ function FeedPage() {
   const [shareFriendsLoading, setShareFriendsLoading] = useState(false);
   const [shareFriends, setShareFriends] = useState([]);
   const [shareSendingUserId, setShareSendingUserId] = useState(null);
+
+  const [expandedContentByPostId, setExpandedContentByPostId] = useState({});
 
   const token = useMemo(() => {
     return localStorage.getItem("token") || getCookie("token");
@@ -177,6 +180,14 @@ function FeedPage() {
     }
   };
 
+  const isPostExpanded = (postId) => {
+    return Boolean(expandedContentByPostId?.[String(postId)]);
+  };
+
+  const setPostExpanded = (postId, expanded) => {
+    setExpandedContentByPostId((prev) => ({ ...prev, [String(postId)]: Boolean(expanded) }));
+  };
+
   const getReactionMeta = (t) => {
     return REACTIONS.find((r) => r.type === t) || null;
   };
@@ -188,6 +199,137 @@ function FeedPage() {
       <span style={{ fontSize: size, lineHeight: 1 }} aria-label={meta.label}>
         {meta.emoji}
       </span>
+    );
+  };
+
+  const renderFeedPostImages = (postId, images) => {
+    const imgs = (Array.isArray(images) ? images : []).filter(Boolean);
+    const count = imgs.length;
+    if (!count) return null;
+
+    const radius = 12;
+    const gap = 6;
+    const show = imgs.slice(0, Math.min(5, count));
+    const more = Math.max(0, count - 5);
+
+    const renderTile = (src, idx, style = {}, overlay = null) => {
+      return (
+        <div
+          key={`${postId}-${idx}`}
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+            borderRadius: radius,
+            ...style,
+          }}
+        >
+          <Image
+            src={src}
+            alt="feed"
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            wrapperStyle={{ width: "100%", height: "100%" }}
+          />
+          {overlay}
+        </div>
+      );
+    };
+
+    if (count === 1) {
+      return <div style={{ width: "100%", height: 520 }}>{renderTile(imgs[0], 0)}</div>;
+    }
+
+    if (count === 2) {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap,
+            height: 420,
+          }}
+        >
+          {show.map((src, idx) => renderTile(src, idx))}
+        </div>
+      );
+    }
+
+    if (count === 3) {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gridTemplateRows: "repeat(2, minmax(0, 1fr))",
+            gap,
+            height: 420,
+          }}
+        >
+          <div style={{ gridColumn: "1 / 2", gridRow: "1 / 3" }}>{renderTile(show[0], 0)}</div>
+          <div style={{ gridColumn: "2 / 3", gridRow: "1 / 2" }}>{renderTile(show[1], 1)}</div>
+          <div style={{ gridColumn: "2 / 3", gridRow: "2 / 3" }}>{renderTile(show[2], 2)}</div>
+        </div>
+      );
+    }
+
+    if (count === 4) {
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gridTemplateRows: "repeat(2, minmax(0, 1fr))",
+            gap,
+            height: 520,
+          }}
+        >
+          {show.map((src, idx) => renderTile(src, idx))}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gridTemplateRows: "repeat(3, minmax(0, 1fr))",
+          gap,
+          height: 520,
+        }}
+      >
+        <div style={{ gridColumn: "1 / 2", gridRow: "1 / 3" }}>{renderTile(show[0], 0)}</div>
+        <div style={{ gridColumn: "2 / 3", gridRow: "1 / 2" }}>{renderTile(show[1], 1)}</div>
+        <div style={{ gridColumn: "2 / 3", gridRow: "2 / 3" }}>{renderTile(show[2], 2)}</div>
+        <div style={{ gridColumn: "1 / 2", gridRow: "3 / 4" }}>{renderTile(show[3], 3)}</div>
+        <div style={{ gridColumn: "2 / 3", gridRow: "3 / 4" }}>
+          {renderTile(
+            show[4],
+            4,
+            {},
+            more > 0 ? (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: radius,
+                  background: "rgba(0,0,0,0.45)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 34,
+                  fontWeight: 700,
+                  pointerEvents: "none",
+                }}
+              >
+                +{more}
+              </div>
+            ) : null,
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -603,7 +745,7 @@ function FeedPage() {
                 return (
                   <List.Item
                     key={item?.id}
-                    style={{ padding: 0, border: "none" }}
+                    style={{ padding: 0, border: "none", marginBottom: 16 }}
                   >
                     <Card id={`post-${item?.id}`} style={{ width: "100%" }} bodyStyle={{ padding: 16 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
@@ -643,26 +785,26 @@ function FeedPage() {
                       ) : null}
 
                       <div style={{ marginTop: 8 }}>
-                        <Text style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{item?.content}</Text>
+                        <Paragraph
+                          style={{ marginBottom: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                          ellipsis={{
+                            rows: 4,
+                            expandable: true,
+                            symbol: isPostExpanded(item?.id) ? "Thu gọn" : "Xem thêm",
+                          }}
+                          onExpand={(_, info) => {
+                            setPostExpanded(item?.id, !info?.expanded);
+                          }}
+                        >
+                          {item?.content}
+                        </Paragraph>
                       </div>
 
                       {Array.isArray(item?.images) && item.images.length ? (
-                        <div
-                          style={{
-                            marginTop: 12,
-                            display: "grid",
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                            gap: 8,
-                          }}
-                        >
-                          {item.images.slice(0, 4).map((src, idx) => (
-                            <img
-                              key={`${item.id}-${idx}`}
-                              src={src}
-                              alt="feed"
-                              style={{ width: "100%", borderRadius: 10, objectFit: "cover", maxHeight: 260 }}
-                            />
-                          ))}
+                        <div style={{ marginTop: 12 }}>
+                          <Image.PreviewGroup items={item.images}>
+                            {renderFeedPostImages(item?.id, item.images)}
+                          </Image.PreviewGroup>
                         </div>
                       ) : null}
 
