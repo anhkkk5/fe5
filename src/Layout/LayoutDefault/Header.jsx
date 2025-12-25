@@ -278,6 +278,7 @@ function Header() {
     { key: "unemployment", icon: <SafetyCertificateOutlined />, label: "Tính bảo hiểm thất nghiệp", path: "/unemployment-insurance" },
     { key: "social", icon: <SolutionOutlined />, label: "Tính bảo hiểm xã hội một lần" },
     { key: "saving-plan", icon: <CalculatorOutlined />, label: "Lập kế hoạch tiết kiệm", path: "/savings-plan" },
+    { key: "company-reviews", icon: <StarOutlined />, label: "Review công ty", path: "/company-reviews" },
     { key: "ads-rent", icon: <MobileOutlined />, label: "Thuê quảng cáo", path: "/ads/rent" },
   ];
 
@@ -481,12 +482,10 @@ function Header() {
 
   // Tùy loại user mà ẩn/bớt một số công cụ
   const visibleToolShortcuts = toolShortcuts.filter((item) => {
-    if (userType === "company" && (item.key === "skill-assessment" || item.key === "company-reviews")) {
-      return false;
+    if (item.key === "company-reviews") {
+      return userType === "candidate";
     }
-    if (!isLoggedIn && item.key === "company-reviews") {
-      return false;
-    }
+    if (userType === "company" && item.key === "skill-assessment") return false;
     return true;
   });
 

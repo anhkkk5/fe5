@@ -78,6 +78,8 @@ function FeedPage() {
   const [keyword, setKeyword] = useState("");
   const [uploadFileList, setUploadFileList] = useState([]);
 
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
   const [reactionSummaryByPostId, setReactionSummaryByPostId] = useState({});
   const [myReactionByPostId, setMyReactionByPostId] = useState({});
 
@@ -123,6 +125,25 @@ function FeedPage() {
 
   const canUseFriends =
     Boolean(token) && ["candidate", "recruiter"].includes(String(currentRole || "").toLowerCase());
+
+  const composerName = useMemo(() => {
+    const role = String(currentRole || "").toLowerCase();
+    if (role === "recruiter") return getCookie("companyName") || "";
+    if (role === "admin") return "";
+    return getCookie("fullName") || "";
+  }, [currentRole]);
+
+  const composerAvatar = useMemo(() => {
+    return getCookie("avatarUrl") || "";
+  }, []);
+
+  const closeCreateModal = () => {
+    try {
+      form.resetFields();
+    } catch (_e) {}
+    setUploadFileList([]);
+    setCreateModalOpen(false);
+  };
 
   const uploadedImages = useMemo(() => {
     return (Array.isArray(uploadFileList) ? uploadFileList : [])
@@ -616,6 +637,7 @@ function FeedPage() {
       messageApi.success("Đăng bài thành công");
       form.resetFields();
       setUploadFileList([]);
+      setCreateModalOpen(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
       setItems([]);
       setTotal(0);
@@ -730,7 +752,40 @@ function FeedPage() {
           <Text type="secondary">Cập nhật tuyển dụng, sự kiện và bài viết từ cộng đồng</Text>
         </div>
 
-        <Card>
+        <Card bodyStyle={{ padding: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <Avatar size={40} src={composerAvatar || undefined}>
+              {String(composerName || "U").slice(0, 1).toUpperCase()}
+            </Avatar>
+            <div
+              onClick={() => setCreateModalOpen(true)}
+              style={{
+                flex: 1,
+                background: "#f0f2f5",
+                borderRadius: 999,
+                padding: "10px 14px",
+                color: "#8c8c8c",
+                cursor: canPost ? "pointer" : "not-allowed",
+                userSelect: "none",
+              }}
+            >
+              {composerName ? `${composerName}, bạn đang nghĩ gì?` : "Bạn đang nghĩ gì?"}
+            </div>
+          </div>
+          {!canPost ? (
+            <div style={{ marginTop: 8 }}>
+              <Text type="secondary">Bạn cần đăng nhập để đăng bài</Text>
+            </div>
+          ) : null}
+        </Card>
+
+        <Modal
+          open={createModalOpen}
+          onCancel={closeCreateModal}
+          footer={null}
+          title="Tạo bài viết"
+          width={760}
+        >
           <Form form={form} layout="vertical" onFinish={onCreate} initialValues={{ type: "post" }}>
             <Form.Item name="type" label="Loại" rules={[{ required: true, message: "Chọn loại bài" }]}>
               <Select options={TYPE_OPTIONS} />
@@ -746,9 +801,7 @@ function FeedPage() {
 
             <Form.Item label="Ảnh (tuỳ chọn)">
               <Upload {...uploadProps}>
-                {uploadFileList.length >= 10 ? null : (
-                  <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
-                )}
+                {uploadFileList.length >= 10 ? null : <Button icon={<UploadOutlined />}>Chọn ảnh</Button>}
               </Upload>
               <div style={{ marginTop: 8 }}>
                 <Text type="secondary">Ảnh sẽ được upload ngay khi chọn (tối đa 10 ảnh, mỗi ảnh ≤ 5MB)</Text>
@@ -759,11 +812,10 @@ function FeedPage() {
               <Button type="primary" htmlType="submit" loading={creating} disabled={!canPost || isUploadingImages}>
                 Đăng
               </Button>
-              {!canPost && <Text type="secondary">Bạn cần đăng nhập để đăng bài</Text>}
               {isUploadingImages && <Text type="secondary">Đang upload ảnh...</Text>}
             </Space>
           </Form>
-        </Card>
+        </Modal>
 
         <Card>
           <Space style={{ width: "100%", justifyContent: "space-between" }}>

@@ -221,9 +221,12 @@ function CompanyReviewsPage() {
                       </div>
 
                       <div className="top-company-meta">
-                        <Tag color="gold" className="top-company-tag">
+                        <Tag className="top-company-tag">
                           <StarOutlined /> {company.stats?.totalReviews || 0} review
                         </Tag>
+                        <Text type="secondary" className="top-company-jobs">
+                          <FileTextOutlined /> {Number(company.jobCount ?? company.jobs?.length ?? 0)} việc làm
+                        </Text>
                         <Text type="secondary" className="top-company-address" title={company.address || ""}>
                           <EnvironmentOutlined /> {company.address || "Chưa cập nhật"}
                         </Text>
@@ -284,7 +287,7 @@ function CompanyReviewsPage() {
                     <div className="company-card-details">
                       <div className="company-detail-item">
                         <FileTextOutlined />{" "}
-                        <Text>{company.jobs?.length || 0} việc làm</Text>
+                        <Text>{Number(company.jobCount ?? company.jobs?.length ?? 0)} việc làm</Text>
                       </div>
                       <div className="company-detail-item">
                         <EnvironmentOutlined /> <Text>{company.address || "N/A"}</Text>

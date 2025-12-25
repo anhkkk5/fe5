@@ -1,5 +1,5 @@
 .company-reviews-page {
-  background: linear-gradient(180deg, rgba(240, 247, 255, 1) 0%, rgba(245, 245, 245, 1) 42%, rgba(255, 247, 230, 0.55) 100%);
+  background: #f5f5f5;
   min-height: 100vh;
   padding: 40px 0;
 }
@@ -20,10 +20,7 @@
 }
 
 .reviews-header h1.ant-typography {
-  background: linear-gradient(90deg, #1677ff 0%, #9254de 52%, #fa8c16 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #0f172a;
 }
 
 .reviews-search-bar {
@@ -35,15 +32,15 @@
 .reviews-search-bar .ant-input-affix-wrapper {
   border-radius: 999px;
   padding: 10px 14px;
-  box-shadow: 0 12px 26px rgba(2, 6, 23, 0.08);
-  border: 1px solid rgba(22, 119, 255, 0.16);
-  background: rgba(255, 255, 255, 0.90);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
 }
 
 .reviews-search-bar .ant-input-affix-wrapper:focus,
 .reviews-search-bar .ant-input-affix-wrapper-focused {
-  border-color: rgba(146, 84, 222, 0.45);
-  box-shadow: 0 14px 30px rgba(146, 84, 222, 0.18);
+  border-color: rgba(22, 119, 255, 0.55);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
 }
 
 .reviews-tabs {
@@ -56,44 +53,43 @@
   border-radius: 999px;
   padding: 0 16px;
   height: 38px;
-  border: 1px solid rgba(22, 119, 255, 0.18);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: #ffffff;
+  box-shadow: none;
 }
 
 .reviews-tabs .ant-btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(146, 84, 222, 0.35);
+  transform: none;
+  border-color: rgba(0, 0, 0, 0.18);
 }
 
 .reviews-tabs .ant-btn-primary {
-  border: none;
-  background: linear-gradient(90deg, #1677ff 0%, #9254de 55%, #fa8c16 100%);
-  box-shadow: 0 14px 28px rgba(22, 119, 255, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: #1677ff;
+  box-shadow: none;
 }
 
 .reviews-tabs .ant-btn-primary:hover {
-  background: linear-gradient(90deg, #3c8cff 0%, #b37feb 55%, #ffc069 100%);
+  background: #1366d6;
 }
 
 .company-review-card {
   border-radius: 14px;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
 .company-review-card:hover {
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
-  transform: translateY(-3px);
-  border-color: rgba(24, 144, 255, 0.22);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+  transform: translateY(-1px);
+  border-color: rgba(0, 0, 0, 0.14);
 }
 
 .company-card-content {
   position: relative;
   padding: 16px;
-  background: radial-gradient(900px 260px at 10% 0%, rgba(146, 84, 222, 0.14) 0%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(180deg, rgba(22, 119, 255, 0.08), rgba(255, 255, 255, 0));
+  background: #ffffff;
 }
 
 .company-card-badge {
@@ -104,9 +100,9 @@
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(90deg, rgba(22, 119, 255, 1) 0%, rgba(146, 84, 222, 1) 60%, rgba(250, 140, 22, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #434343;
+  background: #f5f5f5;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .company-card-header {
@@ -162,9 +158,9 @@
   gap: 16px;
   padding: 18px 18px;
   border-radius: 14px;
-  border: 1px solid rgba(146, 84, 222, 0.18);
-  background: linear-gradient(135deg, rgba(22, 119, 255, 0.14), rgba(146, 84, 222, 0.12), rgba(250, 140, 22, 0.08));
-  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .top-companies-hero-left {
@@ -178,9 +174,9 @@
   font-weight: 700;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  color: #5b21b6;
-  border: 1px solid rgba(146, 84, 222, 0.24);
+  background: #f5f5f5;
+  color: #262626;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .top-companies-hero-right {
@@ -233,8 +229,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(24, 144, 255, 0.12);
-  color: #1677ff;
+  background: rgba(0, 0, 0, 0.06);
+  color: #262626;
 }
 
 .top-company-header {
@@ -272,6 +268,13 @@
   border-radius: 999px;
   padding: 6px 10px;
   font-weight: 600;
+  background: #f5f5f5;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #262626;
+}
+
+.top-company-jobs {
+  white-space: nowrap;
 }
 
 .top-company-address {
