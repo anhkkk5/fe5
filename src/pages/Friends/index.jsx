@@ -43,8 +43,8 @@ function FriendsPage() {
       message.warning("Vui lòng đăng nhập để xem bạn bè");
       return;
     }
-    if (userType !== "candidate") {
-      message.warning("Chỉ ứng viên mới sử dụng tính năng bạn bè");
+    if (!['candidate', 'company'].includes(String(userType || '').toLowerCase())) {
+      message.warning("Bạn cần đăng nhập để sử dụng tính năng bạn bè");
       navigate("/");
       return;
     }
@@ -62,7 +62,9 @@ function FriendsPage() {
 
   const filteredUsers = useMemo(() => {
     const text = (q || "").trim().toLowerCase();
-    const list = (Array.isArray(users) ? users : []).filter((u) => u?.role === "candidate");
+    const list = (Array.isArray(users) ? users : []).filter(
+      (u) => String(u?.role || "").toLowerCase() !== "admin",
+    );
     if (!text) return list;
     return list.filter((u) => {
       const name = (u?.fullName || u?.name || "").toLowerCase();

@@ -107,7 +107,7 @@ function ChatPage() {
         userList.filter(
           (u) =>
             String(u?.id || "") !== String(myUserId || "") &&
-            String(u?.role || "").toLowerCase() === "candidate",
+            String(u?.role || "").toLowerCase() !== "admin",
         ),
       );
 

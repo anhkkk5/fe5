@@ -118,9 +118,11 @@ function FeedPage() {
   const currentRole = auth?.role;
 
   const canPost = Boolean(token);
-  const canChat = Boolean(token) && String(currentRole || "").toLowerCase() === "candidate";
+  const canChat =
+    Boolean(token) && ["candidate", "recruiter"].includes(String(currentRole || "").toLowerCase());
 
-  const canUseFriends = Boolean(token) && String(currentRole || "").toLowerCase() === "candidate";
+  const canUseFriends =
+    Boolean(token) && ["candidate", "recruiter"].includes(String(currentRole || "").toLowerCase());
 
   const uploadedImages = useMemo(() => {
     return (Array.isArray(uploadFileList) ? uploadFileList : [])
@@ -379,7 +381,7 @@ function FeedPage() {
 
   const openReactionsModal = async (postId) => {
     if (!canUseFriends) {
-      messageApi.warning("Chỉ ứng viên mới xem được bạn bè đã thả cảm xúc");
+      messageApi.warning("Bạn cần đăng nhập để xem bạn bè đã thả cảm xúc");
       return;
     }
 
@@ -492,7 +494,7 @@ function FeedPage() {
 
   const openShareModal = async (post) => {
     if (!canUseFriends) {
-      messageApi.warning("Chỉ ứng viên mới chia sẻ cho bạn bè");
+      messageApi.warning("Bạn cần đăng nhập để chia sẻ cho bạn bè");
       return;
     }
 
@@ -555,7 +557,7 @@ function FeedPage() {
 
   const handleChatWith = async (otherUserId) => {
     if (!canChat) {
-      messageApi.warning("Bạn cần đăng nhập bằng tài khoản ứng viên để chat");
+      messageApi.warning("Bạn cần đăng nhập để chat");
       return;
     }
 
