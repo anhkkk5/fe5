@@ -219,11 +219,15 @@ function NotificationsPage() {
                           onClick={() => handleOpen(n)}
                         >
                           <div className="notifications-center__avatar">
-                            <Avatar icon={<BellOutlined />} />
+                            <Avatar src={n?.sender?.avatarUrl} icon={!n?.sender?.avatarUrl ? <BellOutlined /> : null}>
+                              {n?.sender?.name?.charAt?.(0) || ""}
+                            </Avatar>
                           </div>
                           <div className="notifications-center__content">
                             <div className="notifications-center__text">
-                              <Text strong>{n.title || "Thông báo"}</Text>
+                              <Text strong>
+                                {n?.sender?.name ? `${n.sender.name}: ${n.title || ""}` : n.title || "Thông báo"}
+                              </Text>
                               {n.message ? <span className="notifications-center__sep">·</span> : null}
                               {n.message ? <span>{n.message}</span> : null}
                             </div>
@@ -289,11 +293,15 @@ function NotificationsPage() {
                           onClick={() => handleOpen(n)}
                         >
                           <div className="notifications-center__avatar">
-                            <Avatar icon={<BellOutlined />} />
+                            <Avatar src={n?.sender?.avatarUrl} icon={!n?.sender?.avatarUrl ? <BellOutlined /> : null}>
+                              {n?.sender?.name?.charAt?.(0) || ""}
+                            </Avatar>
                           </div>
                           <div className="notifications-center__content">
                             <div className="notifications-center__text">
-                              <Text strong>{n.title || "Thông báo"}</Text>
+                              <Text strong>
+                                {n?.sender?.name ? `${n.sender.name}: ${n.title || ""}` : n.title || "Thông báo"}
+                              </Text>
                               {n.message ? <span className="notifications-center__sep">·</span> : null}
                               {n.message ? <span>{n.message}</span> : null}
                             </div>

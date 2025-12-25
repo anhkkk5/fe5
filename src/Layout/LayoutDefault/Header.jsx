@@ -39,7 +39,7 @@ import {
   BarChartOutlined,
 } from "@ant-design/icons";
 
-import { Badge, Dropdown, Spin } from "antd";
+import { Avatar, Badge, Dropdown, Spin } from "antd";
 
 import { getAllCompany, getMyCompany, updateMyCompany } from "../../services/getAllCompany/companyServices";
 import { getMyCandidateProfile } from "../../services/Candidates/candidatesServices";
@@ -202,11 +202,19 @@ function Header() {
               tabIndex={0}
             >
               <div className="header__notif-item-avatar">
-                <BellOutlined />
+                <Avatar
+                  size={44}
+                  src={n?.sender?.avatarUrl}
+                  icon={!n?.sender?.avatarUrl ? <BellOutlined /> : null}
+                >
+                  {n?.sender?.name?.charAt?.(0) || ""}
+                </Avatar>
               </div>
               <div className="header__notif-item-content">
                 <div className="header__notif-item-top">
-                  <div className="header__notif-item-title">{n.title || "Thông báo"}</div>
+                  <div className="header__notif-item-title">
+                    {n?.sender?.name ? `${n.sender.name}: ${n.title || ""}` : n.title || "Thông báo"}
+                  </div>
                   <div className="header__notif-item-time">{formatRelativeTime(n.created_at)}</div>
                 </div>
                 <div className="header__notif-item-message">{n.message || ""}</div>
