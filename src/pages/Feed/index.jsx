@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Button,
@@ -9,7 +9,6 @@ import {
   Form,
   Input,
   List,
-  Pagination,
   Popover,
   Select,
   Space,
@@ -26,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import { decodeJwt } from "../../services/auth/authServices";
 import { uploadImage } from "../../services/Cloudinary/cloudinaryServices";
-import { createFeedPost, deleteFeedPost, getFeedPosts } from "../../services/feedPosts/feedPostsServices";
+import { createFeedPost, deleteFeedPost, getFeedPosts, shareFeedPost } from "../../services/feedPosts/feedPostsServices";
 import { getOrCreateConversationWith, sendChatMessage } from "../../services/chat/chatServices.jsx";
 import { getMyFriends } from "../../services/friends/friendsServices.jsx";
 import {
@@ -69,6 +68,7 @@ function FeedPage() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [creating, setCreating] = useState(false);
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -103,6 +103,8 @@ function FeedPage() {
 
   const [expandedContentByPostId, setExpandedContentByPostId] = useState({});
 
+  const loadMoreRef = useRef(null);
+
   const token = useMemo(() => {
     return localStorage.getItem("token") || getCookie("token");
   }, []);
@@ -131,8 +133,13 @@ function FeedPage() {
     return (Array.isArray(uploadFileList) ? uploadFileList : []).some((f) => f.status === "uploading");
   }, [uploadFileList]);
 
-  const fetchFeed = async (nextPage = page) => {
-    setLoading(true);
+  const fetchFeed = async (nextPage = page, options = {}) => {
+    const append = Boolean(options?.append);
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     try {
       const res = await getFeedPosts({
         page: nextPage,
@@ -142,7 +149,7 @@ function FeedPage() {
       });
 
       const nextItems = Array.isArray(res?.items) ? res.items : [];
-      setItems(nextItems);
+      setItems((prev) => (append ? [...(Array.isArray(prev) ? prev : []), ...nextItems] : nextItems));
       setTotal(Number(res?.total || 0));
       setPage(Number(res?.page || nextPage));
 
@@ -173,12 +180,24 @@ function FeedPage() {
       }
     } catch (e) {
       messageApi.error("Không thể tải bản tin");
-      setItems([]);
-      setTotal(0);
+      if (!append) {
+        setItems([]);
+        setTotal(0);
+      }
     } finally {
-      setLoading(false);
+      if (append) {
+        setLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
+
+  const hasMore = useMemo(() => {
+    const t = Number(total || 0);
+    if (!t) return false;
+    return (Array.isArray(items) ? items.length : 0) < t;
+  }, [items, total]);
 
   const isPostExpanded = (postId) => {
     return Boolean(expandedContentByPostId?.[String(postId)]);
@@ -428,6 +447,14 @@ function FeedPage() {
       setCommentText("");
       const data = await getFeedPostComments(postId);
       setCommentsTree(Array.isArray(data?.items) ? data.items : []);
+
+      setItems((prev) =>
+        (Array.isArray(prev) ? prev : []).map((p) => {
+          if (String(p?.id || "") !== String(postId)) return p;
+          const nextCount = Number(p?.commentCount || 0) + 1;
+          return { ...p, commentCount: nextCount };
+        }),
+      );
     } catch (_e) {
       messageApi.error("Không thể bình luận");
     }
@@ -450,6 +477,14 @@ function FeedPage() {
       setReplyToId(null);
       const data = await getFeedPostComments(postId);
       setCommentsTree(Array.isArray(data?.items) ? data.items : []);
+
+      setItems((prev) =>
+        (Array.isArray(prev) ? prev : []).map((p) => {
+          if (String(p?.id || "") !== String(postId)) return p;
+          const nextCount = Number(p?.commentCount || 0) + 1;
+          return { ...p, commentCount: nextCount };
+        }),
+      );
     } catch (_e) {
       messageApi.error("Không thể trả lời bình luận");
     }
@@ -492,6 +527,18 @@ function FeedPage() {
       const title = (shareModalPost?.title || "").trim();
       const content = title ? `Chia sẻ bài viết: ${title}\n${link}` : `Chia sẻ bài viết:\n${link}`;
       await sendChatMessage(conv.id, content);
+
+      try {
+        const shareRes = await shareFeedPost(postId);
+        setItems((prev) =>
+          (Array.isArray(prev) ? prev : []).map((p) => {
+            if (String(p?.id || "") !== String(postId)) return p;
+            const nextCount = Number(shareRes?.shareCount ?? p?.shareCount ?? 0);
+            return { ...p, shareCount: nextCount };
+          }),
+        );
+      } catch (_e) {}
+
       messageApi.success("Đã gửi vào đoạn chat");
       setShareModalOpen(false);
       navigate(`/chat?conversationId=${conv.id}`);
@@ -531,11 +578,17 @@ function FeedPage() {
   };
 
   useEffect(() => {
-    fetchFeed(1);
+    setItems([]);
+    setTotal(0);
+    setPage(1);
+    fetchFeed(1, { append: false });
   }, [type]);
 
   const onSearch = () => {
-    fetchFeed(1);
+    setItems([]);
+    setTotal(0);
+    setPage(1);
+    fetchFeed(1, { append: false });
   };
 
   const onCreate = async (values) => {
@@ -561,7 +614,11 @@ function FeedPage() {
       messageApi.success("Đăng bài thành công");
       form.resetFields();
       setUploadFileList([]);
-      fetchFeed(1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setItems([]);
+      setTotal(0);
+      setPage(1);
+      fetchFeed(1, { append: false });
     } catch (e) {
       const backendMsg = e?.response?.data?.message;
       messageApi.error(
@@ -581,7 +638,10 @@ function FeedPage() {
     try {
       await deleteFeedPost(id);
       messageApi.success("Đã xoá bài");
-      fetchFeed(page);
+      setItems([]);
+      setTotal(0);
+      setPage(1);
+      fetchFeed(1, { append: false });
     } catch (e) {
       const backendMsg = e?.response?.data?.message;
       messageApi.error(
@@ -589,6 +649,25 @@ function FeedPage() {
       );
     }
   };
+
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries?.[0];
+        if (!entry?.isIntersecting) return;
+        if (loading || loadingMore) return;
+        if (!hasMore) return;
+        fetchFeed(page + 1, { append: true });
+      },
+      { root: null, rootMargin: "300px", threshold: 0 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, page, type, keyword]);
 
   const uploadProps = {
     multiple: true,
@@ -731,6 +810,8 @@ function FeedPage() {
                 const myReaction = myReactionByPostId[item?.id] || null;
                 const counts = reactionSummary?.counts || {};
                 const totalReactions = Number(reactionSummary?.total || 0);
+                const commentCount = Number(item?.commentCount || 0);
+                const shareCount = Number(item?.shareCount || 0);
                 const iconTypes = REACTIONS.map((r) => r.type).filter((t) => Number(counts?.[t] || 0) > 0);
                 const topIcons = iconTypes.slice(0, 2);
 
@@ -801,14 +882,14 @@ function FeedPage() {
                       </div>
 
                       {Array.isArray(item?.images) && item.images.length ? (
-                        <div style={{ marginTop: 12 }}>
+                        <div style={{ marginTop: 12, overflow: "hidden" }}>
                           <Image.PreviewGroup items={item.images}>
                             {renderFeedPostImages(item?.id, item.images)}
                           </Image.PreviewGroup>
                         </div>
                       ) : null}
 
-                      {totalReactions > 0 ? (
+                      {totalReactions > 0 || commentCount > 0 || shareCount > 0 ? (
                         <div
                           onClick={() => openReactionsModal(item.id)}
                           style={{
@@ -821,17 +902,25 @@ function FeedPage() {
                           }}
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-                              {topIcons.map((t) => (
-                                <span key={t} style={{ display: "inline-flex" }}>
-                                  {renderReactionIcon(t, 16)}
-                                </span>
-                              ))}
-                            </div>
-                            <Text type="secondary">{totalReactions}</Text>
+                            {totalReactions > 0 ? (
+                              <>
+                                <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                  {topIcons.map((t) => (
+                                    <span key={t} style={{ display: "inline-flex" }}>
+                                      {renderReactionIcon(t, 16)}
+                                    </span>
+                                  ))}
+                                </div>
+                                <Text type="secondary">{totalReactions}</Text>
+                              </>
+                            ) : null}
                           </div>
 
-                          <Text type="secondary"> </Text>
+                          <Text type="secondary">
+                            {commentCount > 0 ? `${commentCount} bình luận` : ""}
+                            {commentCount > 0 && shareCount > 0 ? " · " : ""}
+                            {shareCount > 0 ? `${shareCount} lượt chia sẻ` : ""}
+                          </Text>
                         </div>
                       ) : null}
 
@@ -1178,17 +1267,10 @@ function FeedPage() {
               ) : null}
             </Modal>
 
+            <div ref={loadMoreRef} style={{ height: 1 }} />
             <div style={{ marginTop: 16, textAlign: "center" }}>
-              <Pagination
-                current={page}
-                pageSize={limit}
-                total={total}
-                showSizeChanger={false}
-                onChange={(p) => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                  fetchFeed(p);
-                }}
-              />
+              {loadingMore ? <Text type="secondary">Đang tải thêm...</Text> : null}
+              {!loadingMore && !hasMore && total > 0 ? <Text type="secondary">Bạn đã xem hết bài viết</Text> : null}
             </div>
           </div>
         </Card>

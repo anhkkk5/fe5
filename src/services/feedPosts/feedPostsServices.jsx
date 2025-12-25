@@ -27,3 +27,7 @@ export const updateFeedPost = async (id, payload) => {
 export const deleteFeedPost = async (id) => {
   return await del(`feed-posts/${id}`);
 };
+
+export const shareFeedPost = async (id) => {
+  return await post(`feed-posts/${id}/share`);
+};
