@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Avatar, Button, Card, Col, Input, List, Row, Spin, Tabs, Typography, message } from "antd";
+import { Avatar, Button, Card, Col, Input, List, Modal, Row, Spin, Tabs, Typography, message } from "antd";
+import { Document, Page, pdfjs } from "react-pdf";
 import { useSearchParams } from "react-router-dom";
 import { getCookie } from "../../helpers/cookie";
 import { decodeJwt } from "../../services/auth/authServices";
 import { getAllUsers } from "../../services/users/usersServices";
+
 import {
   getConversationMessages,
   getMyConversations,
@@ -14,6 +16,17 @@ import {
 import { connectSocket } from "../../realtime/socketClient";
 
 const { Title, Text } = Typography;
+
+const API_BASE_URL =
+  (import.meta.env?.VITE_API_BASE_URL || "").trim() || "https://be-dw0z.onrender.com/";
+const NORMALIZED_BASE_URL = API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`;
+
+try {
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url,
+  ).toString();
+} catch (_e) {}
 
 const getUserDisplayName = (u) => {
   const role = String(u?.role || "").toLowerCase();
@@ -58,6 +71,14 @@ function ChatPage() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [onlineUserIds, setOnlineUserIds] = useState(() => new Set());
+  const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
+  const [pdfPreviewName, setPdfPreviewName] = useState("");
+  const [pdfPreviewData, setPdfPreviewData] = useState(null);
+  const [pdfNumPages, setPdfNumPages] = useState(0);
+  const [pdfPage, setPdfPage] = useState(1);
+  const [pdfLoadError, setPdfLoadError] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
   const listRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -68,6 +89,50 @@ function ChatPage() {
     const exists = list.some((m) => (m?.id != null ? String(m.id) : "") === nextId);
     return exists ? list : [...list, nextMsg];
   };
+
+  const openPdfPreview = (url, name, messageId) => {
+    const proxyUrl = messageId ? `${NORMALIZED_BASE_URL}chat/messages/${messageId}/attachment` : url;
+    if (!proxyUrl) return;
+    setPdfPreviewUrl(String(proxyUrl));
+    setPdfPreviewName(String(name || ""));
+    setPdfPreviewData(null);
+    setPdfNumPages(0);
+    setPdfPage(1);
+    setPdfLoadError("");
+    setPdfPreviewOpen(true);
+  };
+
+  useEffect(() => {
+    const run = async () => {
+      if (!pdfPreviewOpen || !pdfPreviewUrl) return;
+      try {
+        setPdfLoading(true);
+        setPdfLoadError("");
+        setPdfPreviewData(null);
+
+        const token = getCookie("token") || localStorage.getItem("token") || "";
+        const res = await fetch(pdfPreviewUrl, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const ab = await res.arrayBuffer();
+        setPdfPreviewData(new Uint8Array(ab));
+      } catch (e) {
+        setPdfLoadError("Không thể tải PDF để preview. Vui lòng mở bằng link.");
+        try {
+          console.error("PDF fetch error:", e);
+        } catch (_e) {}
+      } finally {
+        setPdfLoading(false);
+      }
+    };
+
+    run();
+  }, [pdfPreviewOpen, pdfPreviewUrl]);
 
   const myUserId = useMemo(() => {
     const cookieId = getCookie("id");
@@ -557,14 +622,13 @@ function ChatPage() {
 
                       {hasAttachment && isPdf ? (
                         <div style={{ marginBottom: caption ? 8 : 0 }}>
-                          <a
-                            href={m.attachmentUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            style={{ color: mine ? "#fff" : "#1677ff", textDecoration: "underline" }}
+                          <Button
+                            type="link"
+                            style={{ padding: 0, height: "auto", color: mine ? "#fff" : "#1677ff" }}
+                            onClick={() => openPdfPreview(m.attachmentUrl, m?.attachmentOriginalName, m?.id)}
                           >
-                            {m?.attachmentOriginalName ? `PDF: ${m.attachmentOriginalName}` : "Mở file PDF"}
-                          </a>
+                            {m?.attachmentOriginalName ? `PDF: ${m.attachmentOriginalName}` : "Xem file PDF"}
+                          </Button>
                         </div>
                       ) : null}
 
@@ -605,6 +669,74 @@ function ChatPage() {
           </Card>
         </Col>
       </Row>
+
+      <Modal
+        open={pdfPreviewOpen}
+        title={pdfPreviewName ? `PDF: ${pdfPreviewName}` : "Xem PDF"}
+        onCancel={() => setPdfPreviewOpen(false)}
+        footer={null}
+        width={900}
+        destroyOnClose
+      >
+        {pdfLoadError ? (
+          <div>
+            <Text type="danger">{pdfLoadError}</Text>
+            <div style={{ marginTop: 8 }}>
+              <a href={pdfPreviewUrl} target="_blank" rel="noreferrer">
+                Mở/Tải PDF
+              </a>
+            </div>
+          </div>
+        ) : pdfLoading || !pdfPreviewData ? (
+          <div style={{ textAlign: "center", padding: 24 }}>
+            <Spin />
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <Button
+                  onClick={() => setPdfPage((p) => Math.max(1, p - 1))}
+                  disabled={pdfPage <= 1}
+                >
+                  Trang trước
+                </Button>
+                <Button
+                  style={{ marginLeft: 8 }}
+                  onClick={() => setPdfPage((p) => (pdfNumPages ? Math.min(pdfNumPages, p + 1) : p + 1))}
+                  disabled={pdfNumPages ? pdfPage >= pdfNumPages : false}
+                >
+                  Trang sau
+                </Button>
+              </div>
+              <Text>
+                Trang {pdfPage}
+                {pdfNumPages ? ` / ${pdfNumPages}` : ""}
+              </Text>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", overflow: "auto" }}>
+              <Document
+                file={{ data: pdfPreviewData }}
+                onLoadSuccess={(info) => {
+                  setPdfNumPages(info?.numPages || 0);
+                  setPdfLoadError("");
+                  setPdfPage(1);
+                }}
+                onLoadError={(err) => {
+                  setPdfLoadError("Không thể tải PDF để preview (có thể do quyền truy cập/CORS). Vui lòng mở bằng link.");
+                  try {
+                    console.error("PDF load error:", err);
+                  } catch (_e) {}
+                }}
+                loading={<Spin />}
+              >
+                <Page pageNumber={pdfPage} renderTextLayer={false} renderAnnotationLayer={false} />
+              </Document>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
