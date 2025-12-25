@@ -56,6 +56,18 @@ export const connectSocket = () => {
       } catch (_e) {}
     });
 
+    socket.on("presence:list", (payload) => {
+      try {
+        window.dispatchEvent(new CustomEvent("presence:list", { detail: payload }));
+      } catch (_e) {}
+    });
+
+    socket.on("presence:update", (payload) => {
+      try {
+        window.dispatchEvent(new CustomEvent("presence:update", { detail: payload }));
+      } catch (_e) {}
+    });
+
     return socket;
   } catch (_e) {
     return null;

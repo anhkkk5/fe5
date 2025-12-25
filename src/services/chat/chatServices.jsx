@@ -1,4 +1,4 @@
-import { get, post } from "../../utils/axios/request";
+  import { get, post, postForm } from "../../utils/axios/request";
 
 export const getMyConversations = async () => {
   return await get("chat/conversations/my");
@@ -14,4 +14,13 @@ export const getConversationMessages = async (conversationId) => {
 
 export const sendChatMessage = async (conversationId, content) => {
   return await post(`chat/conversations/${conversationId}/messages`, { content });
+};
+
+export const sendChatAttachment = async (conversationId, file, content = "") => {
+  const form = new FormData();
+  form.append("file", file);
+  if (typeof content === "string" && content.trim()) {
+    form.append("content", content);
+  }
+  return await postForm(`chat/conversations/${conversationId}/messages/attachment`, form);
 };

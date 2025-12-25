@@ -8,6 +8,7 @@ import {
   getConversationMessages,
   getMyConversations,
   getOrCreateConversationWith,
+  sendChatAttachment,
   sendChatMessage,
 } from "../../services/chat/chatServices.jsx";
 import { connectSocket } from "../../realtime/socketClient";
@@ -55,7 +56,18 @@ function ChatPage() {
   const [searchUser, setSearchUser] = useState("");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [onlineUserIds, setOnlineUserIds] = useState(() => new Set());
   const listRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const appendMessageUnique = (prev, nextMsg) => {
+    const list = Array.isArray(prev) ? prev : [];
+    const nextId = nextMsg?.id != null ? String(nextMsg.id) : "";
+    if (!nextId) return [...list, nextMsg];
+    const exists = list.some((m) => (m?.id != null ? String(m.id) : "") === nextId);
+    return exists ? list : [...list, nextMsg];
+  };
 
   const myUserId = useMemo(() => {
     const cookieId = getCookie("id");
@@ -180,7 +192,7 @@ function ChatPage() {
       const convId = payload?.conversationId != null ? String(payload.conversationId) : payload?.conversation?.id != null ? String(payload.conversation.id) : "";
       const activeId = activeConversation?.id != null ? String(activeConversation.id) : "";
       if (convId && activeId && convId === activeId) {
-        setMessagesList((prev) => [...(Array.isArray(prev) ? prev : []), payload]);
+        setMessagesList((prev) => appendMessageUnique(prev, payload));
         setTimeout(scrollToBottom, 0);
       }
 
@@ -206,6 +218,38 @@ function ChatPage() {
       } catch (_e) {}
     };
   }, [activeConversation?.id]);
+
+  useEffect(() => {
+    const onPresenceList = (evt) => {
+      const ids = evt?.detail?.userIds;
+      if (!Array.isArray(ids)) return;
+      setOnlineUserIds(new Set(ids.map((x) => String(x))));
+    };
+
+    const onPresenceUpdate = (evt) => {
+      const userId = evt?.detail?.userId != null ? String(evt.detail.userId) : "";
+      const online = !!evt?.detail?.online;
+      if (!userId) return;
+      setOnlineUserIds((prev) => {
+        const next = new Set(Array.from(prev || []).map((x) => String(x)));
+        if (online) next.add(userId);
+        else next.delete(userId);
+        return next;
+      });
+    };
+
+    try {
+      window.addEventListener("presence:list", onPresenceList);
+      window.addEventListener("presence:update", onPresenceUpdate);
+    } catch (_e) {}
+
+    return () => {
+      try {
+        window.removeEventListener("presence:list", onPresenceList);
+        window.removeEventListener("presence:update", onPresenceUpdate);
+      } catch (_e) {}
+    };
+  }, []);
 
   const filteredUsers = useMemo(() => {
     const q = (searchUser || "").toLowerCase().trim();
@@ -236,6 +280,47 @@ function ChatPage() {
     }
   };
 
+  const openFilePicker = () => {
+    if (!activeConversation?.id) return;
+    try {
+      fileInputRef.current?.click?.();
+    } catch (_e) {}
+  };
+
+  const handleFileSelected = async (e) => {
+    const file = e?.target?.files?.[0];
+    try {
+      if (!file) return;
+      if (!activeConversation?.id) return;
+
+      const isImage = String(file.type || "").startsWith("image/");
+      const isPdf = String(file.type || "") === "application/pdf" || String(file.name || "").toLowerCase().endsWith(".pdf");
+      if (!isImage && !isPdf) {
+        message.error("Chỉ hỗ trợ gửi ảnh hoặc file PDF");
+        return;
+      }
+
+      setUploading(true);
+      const sent = await sendChatAttachment(activeConversation.id, file, text);
+      setText("");
+      if (sent) {
+        setMessagesList((prev) => appendMessageUnique(prev, sent));
+        setTimeout(scrollToBottom, 0);
+      }
+    } catch (err) {
+      if (err?.response?.status === 403) {
+        message.error("Bạn cần kết bạn trước khi chat");
+        return;
+      }
+      message.error("Gửi file thất bại");
+    } finally {
+      try {
+        if (e?.target) e.target.value = "";
+      } catch (_e) {}
+      setUploading(false);
+    }
+  };
+
   const handleSend = async () => {
     const content = (text || "").trim();
     if (!content) return;
@@ -245,7 +330,7 @@ function ChatPage() {
       const sent = await sendChatMessage(activeConversation.id, content);
       setText("");
       if (sent) {
-        setMessagesList((prev) => [...(Array.isArray(prev) ? prev : []), sent]);
+        setMessagesList((prev) => appendMessageUnique(prev, sent));
         setTimeout(scrollToBottom, 0);
       }
     } catch (e) {
@@ -289,6 +374,8 @@ function ChatPage() {
                       renderItem={(c) => {
                         const other = otherUserFromConversation(c);
                         const isActive = String(c?.id) === String(activeConversation?.id);
+                        const otherId = other?.id != null ? String(other.id) : "";
+                        const isOnline = !!(otherId && onlineUserIds?.has?.(otherId));
                         return (
                           <List.Item
                             style={{
@@ -300,18 +387,40 @@ function ChatPage() {
                             onClick={() => setActiveConversation(c)}
                           >
                             <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
-                              <Avatar src={getUserAvatarUrl(other) || undefined} size={34}>
-                                {String(getUserDisplayName(other) || "").charAt(0).toUpperCase()}
-                              </Avatar>
+                              <div style={{ position: "relative", width: 34, height: 34 }}>
+                                <Avatar src={getUserAvatarUrl(other) || undefined} size={34}>
+                                  {String(getUserDisplayName(other) || "").charAt(0).toUpperCase()}
+                                </Avatar>
+                                {isOnline ? (
+                                  <span
+                                    style={{
+                                      position: "absolute",
+                                      right: -1,
+                                      bottom: -1,
+                                      width: 10,
+                                      height: 10,
+                                      borderRadius: 999,
+                                      background: "#52c41a",
+                                      border: "2px solid #fff",
+                                    }}
+                                  />
+                                ) : null}
+                              </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                                   <Text strong ellipsis>
                                     {getUserDisplayName(other)}
                                   </Text>
                                 </div>
-                                {c?.lastMessage?.content ? (
+                                {c?.lastMessage ? (
                                   <Text type="secondary" style={{ fontSize: 12 }}>
-                                    {c.lastMessage.content}
+                                    {c.lastMessage.content
+                                      ? c.lastMessage.content
+                                      : c.lastMessage.attachmentType === "pdf"
+                                      ? "[PDF]"
+                                      : c.lastMessage.attachmentType === "image"
+                                      ? "[Ảnh]"
+                                      : ""}
                                   </Text>
                                 ) : null}
                               </div>
@@ -341,9 +450,25 @@ function ChatPage() {
                             onClick={() => startChatWith(u.id)}
                           >
                             <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
-                              <Avatar src={getUserAvatarUrl(u) || undefined} size={34}>
-                                {String(getUserDisplayName(u) || "").charAt(0).toUpperCase()}
-                              </Avatar>
+                              <div style={{ position: "relative", width: 34, height: 34 }}>
+                                <Avatar src={getUserAvatarUrl(u) || undefined} size={34}>
+                                  {String(getUserDisplayName(u) || "").charAt(0).toUpperCase()}
+                                </Avatar>
+                                {u?.id != null && onlineUserIds?.has?.(String(u.id)) ? (
+                                  <span
+                                    style={{
+                                      position: "absolute",
+                                      right: -1,
+                                      bottom: -1,
+                                      width: 10,
+                                      height: 10,
+                                      borderRadius: 999,
+                                      background: "#52c41a",
+                                      border: "2px solid #fff",
+                                    }}
+                                  />
+                                ) : null}
+                              </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <Text strong ellipsis>
                                   {getUserDisplayName(u)}
@@ -396,6 +521,10 @@ function ChatPage() {
               {(Array.isArray(messagesList) ? messagesList : []).map((m) => {
                 const senderId = m?.sender?.id != null ? String(m.sender.id) : m?.senderId != null ? String(m.senderId) : "";
                 const mine = myUserId && senderId && String(senderId) === String(myUserId);
+                const hasAttachment = !!m?.attachmentType && !!m?.attachmentUrl;
+                const isImage = String(m?.attachmentType || "") === "image";
+                const isPdf = String(m?.attachmentType || "") === "pdf";
+                const caption = (m?.content || "").trim();
                 return (
                   <div
                     key={m?.id || `${m?.created_at || m?.createdAt}-${Math.random()}`}
@@ -416,14 +545,47 @@ function ChatPage() {
                         whiteSpace: "pre-wrap",
                       }}
                     >
-                      {m?.content}
+                      {hasAttachment && isImage ? (
+                        <div style={{ marginBottom: caption ? 8 : 0 }}>
+                          <img
+                            src={m.attachmentUrl}
+                            alt={m?.attachmentOriginalName || "attachment"}
+                            style={{ maxWidth: 260, borderRadius: 10, display: "block" }}
+                          />
+                        </div>
+                      ) : null}
+
+                      {hasAttachment && isPdf ? (
+                        <div style={{ marginBottom: caption ? 8 : 0 }}>
+                          <a
+                            href={m.attachmentUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: mine ? "#fff" : "#1677ff", textDecoration: "underline" }}
+                          >
+                            {m?.attachmentOriginalName ? `PDF: ${m.attachmentOriginalName}` : "Mở file PDF"}
+                          </a>
+                        </div>
+                      ) : null}
+
+                      {caption ? caption : null}
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            <div style={{ display: "flex", gap: 8, paddingTop: 10 }}>
+            <div style={{ display: "flex", gap: 8, paddingTop: 10, alignItems: "flex-end" }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                style={{ display: "none" }}
+                accept="image/*,application/pdf"
+                onChange={handleFileSelected}
+              />
+              <Button onClick={openFilePicker} disabled={!activeConversation?.id} loading={uploading}>
+                Gửi ảnh/PDF
+              </Button>
               <Input.TextArea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -436,7 +598,7 @@ function ChatPage() {
                 }}
                 disabled={!activeConversation?.id}
               />
-              <Button type="primary" onClick={handleSend} loading={sending} disabled={!activeConversation?.id}>
+              <Button type="primary" onClick={handleSend} loading={sending} disabled={!activeConversation?.id || uploading}>
                 Gửi
               </Button>
             </div>
