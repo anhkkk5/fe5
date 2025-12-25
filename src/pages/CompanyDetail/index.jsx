@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCookie } from "../../helpers/cookie";
+import { getCookie, setCookie } from "../../helpers/cookie";
 import {
   Card,
   Row,
@@ -190,6 +190,12 @@ function CompanyDetail() {
       await editCompany(id, updateData);
       message.success("Cập nhật thông tin công ty thành công!");
       setEditModalVisible(false);
+
+      try {
+        setCookie("companyName", values.companyName || "", 1);
+        const nextLogo = logoUrl || company?.logo;
+        if (nextLogo) setCookie("avatarUrl", nextLogo, 1);
+      } catch (_e) {}
       
       // Refresh company data
       const updatedData = await getDetaiCompany(id);

@@ -15,16 +15,32 @@ import { connectSocket } from "../../realtime/socketClient";
 const { Title, Text } = Typography;
 
 const getUserDisplayName = (u) => {
-  const fullName = (u?.fullName || "").trim();
-  if (fullName) return fullName;
+  const role = String(u?.role || "").toLowerCase();
 
+  const companyName =
+    (u?.company?.companyName || u?.companyName || u?.company?.fullName || u?.companyFullName || "").trim();
+  const candidateName =
+    (u?.candidateProfile?.fullName || u?.candidateFullName || "").trim();
+
+  const fullName = (u?.fullName || "").trim();
   const name = (u?.name || "").trim();
+
+  const preferred = role === "recruiter" ? companyName : candidateName;
+  if (preferred) return preferred;
+  if (fullName) return fullName;
   if (name && name.length > 1) return name;
 
   const email = (u?.email || "").trim();
   if (email) return email.split("@")[0] || email;
 
   return "Người dùng";
+};
+
+const getUserAvatarUrl = (u) => {
+  const role = String(u?.role || "").toLowerCase();
+  if (u?.avatarUrl) return u.avatarUrl;
+  if (role === "recruiter") return u?.company?.logo || u?.companyLogo || null;
+  return u?.candidateProfile?.avatarUrl || u?.candidateAvatarUrl || null;
 };
 
 function ChatPage() {
@@ -284,7 +300,7 @@ function ChatPage() {
                             onClick={() => setActiveConversation(c)}
                           >
                             <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
-                              <Avatar src={other?.avatarUrl || undefined} size={34}>
+                              <Avatar src={getUserAvatarUrl(other) || undefined} size={34}>
                                 {String(getUserDisplayName(other) || "").charAt(0).toUpperCase()}
                               </Avatar>
                               <div style={{ flex: 1, minWidth: 0 }}>
@@ -325,7 +341,7 @@ function ChatPage() {
                             onClick={() => startChatWith(u.id)}
                           >
                             <div style={{ width: "100%", display: "flex", gap: 10, alignItems: "center" }}>
-                              <Avatar src={u?.avatarUrl || undefined} size={34}>
+                              <Avatar src={getUserAvatarUrl(u) || undefined} size={34}>
                                 {String(getUserDisplayName(u) || "").charAt(0).toUpperCase()}
                               </Avatar>
                               <div style={{ flex: 1, minWidth: 0 }}>
@@ -355,7 +371,7 @@ function ChatPage() {
             <div style={{ padding: "4px 4px 10px 4px", borderBottom: "1px solid #f0f0f0" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 {activeOther ? (
-                  <Avatar src={activeOther?.avatarUrl || undefined} size={36}>
+                  <Avatar src={getUserAvatarUrl(activeOther) || undefined} size={36}>
                     {String(getUserDisplayName(activeOther) || "").charAt(0).toUpperCase()}
                   </Avatar>
                 ) : (

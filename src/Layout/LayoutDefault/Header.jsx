@@ -420,12 +420,17 @@ function Header() {
       const type = getCookie("userType") || (token ? decodeJwt(token)?.role : "");
       const cachedId = getCookie("companyId");
       const cachedName = getCookie("companyName");
-      if (!token || type !== "company" || (cachedId && cachedName)) return;
+      const cachedAvatar = getCookie("avatarUrl");
+      if (!token || type !== "company" || (cachedId && cachedName && cachedAvatar)) return;
       try {
         const comp = await getMyCompany();
         if (comp?.id) {
           setCookie("companyId", comp.id, 1);
           setCookie("companyName", comp.companyName || comp.fullName, 1);
+          if (comp?.logo) {
+            setCookie("avatarUrl", comp.logo, 1);
+            setUserAvatar(comp.logo);
+          }
           setCompanyId(String(comp.id));
           setUserName(comp.companyName || comp.fullName || "");
         }
@@ -502,6 +507,10 @@ function Header() {
       if (comp?.id) {
         setCookie("companyId", comp.id, 1);
         setCookie("companyName", comp.companyName || comp.fullName, 1);
+        if (comp?.logo) {
+          setCookie("avatarUrl", comp.logo, 1);
+          setUserAvatar(comp.logo);
+        }
         navigate(`/companies/${comp.id}`);
       }
     } catch (e) {
@@ -576,7 +585,7 @@ function Header() {
           },
         ]
       : []),
-    ...(userType !== "admin"
+    ...(userType === "candidate"
       ? [
           {
             key: "profile",
@@ -585,7 +594,7 @@ function Header() {
           },
         ]
       : []),
-    ...(userType === "candidate"
+    ...(["candidate", "company"].includes(String(userType || "").toLowerCase())
       ? [
           {
             key: "friends",

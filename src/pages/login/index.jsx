@@ -91,6 +91,7 @@ function Login() {
           if (company) {
             setCookie("companyName", company.companyName || company.fullName || "", time);
             setCookie("companyId", company.id, time);
+            if (company?.logo) setCookie("avatarUrl", company.logo, time);
           }
         } catch (e) {
           const status = e?.response?.status;
@@ -103,6 +104,7 @@ function Login() {
                 if (created?.id) {
                   setCookie("companyName", created.companyName || created.fullName || "", time);
                   setCookie("companyId", created.id, time);
+                  if (created?.logo) setCookie("avatarUrl", created.logo, time);
                 }
               }
             } catch (_) {}

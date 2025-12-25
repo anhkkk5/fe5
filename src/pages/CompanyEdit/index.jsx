@@ -10,7 +10,7 @@ import {
   Upload,
   Image,
 } from "antd";
-import { getCookie } from "../../helpers/cookie";
+import { getCookie, setCookie } from "../../helpers/cookie";
 import {
   getDetaiCompany,
   editCompany,
@@ -81,6 +81,12 @@ function CompanyEdit() {
       };
 
       await editCompany(id, updateData);
+
+      try {
+        setCookie("companyName", values.companyName || "", 1);
+        if (logoUrl) setCookie("avatarUrl", logoUrl, 1);
+      } catch (_e) {}
+
       message.success("Cập nhật thông tin công ty thành công!");
       setModalVisible(false);
       setTimeout(() => {
